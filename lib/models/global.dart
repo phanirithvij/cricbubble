@@ -8,7 +8,6 @@ part 'global.g.dart';
 
 @JsonSerializable(nullable: false)
 class GlobalDataModel {
-  /* TODO see if types error out */
   final List<Commentary> commentaryList;
   final List<CommentarySnippet> commentarySnippetList;
   final bool enableNoContent;

@@ -10,7 +10,9 @@ Team _$TeamFromJson(Map<String, dynamic> json) {
   return Team(
     id: json['id'] as num,
     name: json['name'] as String,
-    playerDetails: json['playerDetails'] as List,
+    playerDetails: (json['playerDetails'] as List)
+        .map((e) => MatchPlayer.fromJson(e as Map<String, dynamic>))
+        .toList(),
     shortName: json['shortName'] as String,
   );
 }

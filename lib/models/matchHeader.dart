@@ -19,15 +19,11 @@ class MatchHeader {
   final int matchId;
   // TODO timestamps verify later(int/not)
   final num matchStartTimestamp;
-  // TODO handle lists
   final List<MatchTeamInfo> matchTeamInfo;
   final String matchType;
-  // TODO handle lists
   final List<MatchPlayer> playersOfTheMatch;
-  // TODO handle lists
   final List<SeriesPlayer> playersOfTheSeries;
   final Result result;
-  // TODO class
   final RevisedTarget revisedTarget;
   final String seriesDesc;
   final String state;

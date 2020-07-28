@@ -1,3 +1,4 @@
+import 'package:cricbubble/models/matchHeader.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'team.g.dart';
@@ -6,8 +7,8 @@ part 'team.g.dart';
 class Team {
   final num id;
   final String name;
-  //TODO
-  final List playerDetails;
+  //TODO check if correct?
+  final List<MatchPlayer> playerDetails;
   final String shortName;
 
   Team({
