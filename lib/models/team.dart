@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'team.g.dart';
+
+@JsonSerializable(nullable: false)
 class Team {
   final num id;
   final String name;
@@ -12,12 +17,6 @@ class Team {
     this.shortName,
   });
 
-  factory Team.fromJson(Map<String, dynamic> json) {
-    return Team(
-      id: json['id'],
-      name: json['name'],
-      playerDetails: json['playerDetails'],
-      shortName: json['shortName'],
-    );
-  }
+  factory Team.fromJson(Map<String, dynamic> json) => _$TeamFromJson(json);
+  Map<String, dynamic> toJson() => _$TeamToJson(this);
 }

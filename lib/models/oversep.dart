@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'oversep.g.dart';
+
+@JsonSerializable(nullable: true)
 class OverSeparator {
   final int batNonStrikerBalls;
   final List<int> batNonStrikerIds;
@@ -50,31 +55,7 @@ class OverSeparator {
     this.wickets,
   });
 
-  factory OverSeparator.fromJson(Map<String, dynamic> json) {
-    return OverSeparator(
-      batNonStrikerBalls: json['batNonStrikerBalls'],
-      batNonStrikerIds: json['batNonStrikerIds'],
-      batNonStrikerNames: json['batNonStrikerNames'],
-      batNonStrikerRuns: json['batNonStrikerRuns'],
-      batStrikerBalls: json['batStrikerBalls'],
-      batStrikerIds: json['batStrikerIds'],
-      batStrikerNames: json['batStrikerNames'],
-      batStrikerRuns: json['batStrikerRuns'],
-      batTeamName: json['batTeamName'],
-      bowlIds: json['bowlIds'],
-      bowlMaidens: json['bowlMaidens'],
-      bowlNames: json['bowlNames'],
-      bowlOvers: json['bowlOvers'],
-      bowlRuns: json['bowlRuns'],
-      bowlWickets: json['bowlWickets'],
-      event: json['event'],
-      inningsId: json['inningsId'],
-      overSummary: json['o_summary'],
-      overNum: json['overNum'],
-      runs: json['runs'],
-      score: json['score'],
-      timestamp: json['timestamp'],
-      wickets: json['wickets'],
-    );
-  }
+  factory OverSeparator.fromJson(Map<String, dynamic> json) =>
+      _$OverSeparatorFromJson(json);
+  Map<String, dynamic> toJson() => _$OverSeparatorToJson(this);
 }

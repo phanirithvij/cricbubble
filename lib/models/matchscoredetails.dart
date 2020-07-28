@@ -1,5 +1,9 @@
 import 'package:cricbubble/models/inningscore.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'matchscoredetails.g.dart';
+
+@JsonSerializable(nullable: false)
 class MatchScoreDetails {
   final String customStatus;
   final num highlightedTeamId;
@@ -17,16 +21,8 @@ class MatchScoreDetails {
     this.matchId,
   });
 
-  factory MatchScoreDetails.fromJson(Map<String, dynamic> json) {
-    return MatchScoreDetails(
-      customStatus: json['customStatus'],
-      highlightedTeamId: json['highlightedTeamId'],
-      inningsScoreList: (json['inningsScoreList'] as List)
-          .map((x) => InningsScore.fromJson(x))
-          .toList(),
-      isMatchNotCovered: json['isMatchNotCovered'],
-      matchFormat: json['matchFormat'],
-      matchId: json['matchId'],
-    );
-  }
+  factory MatchScoreDetails.fromJson(Map<String, dynamic> json) =>
+      _$MatchScoreDetailsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MatchScoreDetailsToJson(this);
 }

@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'inningscore.g.dart';
+
+@JsonSerializable(nullable: false)
 class InningsScore {
   final num batTeamId;
   final String batTeamName;
@@ -18,16 +23,8 @@ class InningsScore {
     this.score,
     this.wickets,
   });
-  factory InningsScore.fromJson(Map<String, dynamic> json) {
-    return InningsScore(
-      batTeamId: json['batTeamId'],
-      batTeamName: json['batTeamName'],
-      inningsId: json['inningsId'],
-      isDeclared: json['isDeclared'],
-      isFollowOn: json['isFollowOn'],
-      overs: json['overs'],
-      score: json['score'],
-      wickets: json['wickets'],
-    );
-  }
+
+  factory InningsScore.fromJson(Map<String, dynamic> json) =>
+      _$InningsScoreFromJson(json);
+  Map<String, dynamic> toJson() => _$InningsScoreToJson(this);
 }

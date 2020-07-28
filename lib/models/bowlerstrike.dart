@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'bowlerstrike.g.dart';
+
+@JsonSerializable(nullable: true)
 class BowlerStrike {
   final double bowlEcon;
   final num bowlId;
@@ -21,17 +26,7 @@ class BowlerStrike {
     this.bowlWkts,
   });
 
-  factory BowlerStrike.fromJson(Map<String, dynamic> json) {
-    return BowlerStrike(
-      bowlEcon: json['bowlEcon'],
-      bowlId: json['bowlId'],
-      bowlMaidens: json['bowlMaidens'],
-      bowlName: json['bowlName'],
-      bowlNoballs: json['bowlNoballs'],
-      bowlOvs: json['bowlOvs'],
-      bowlRuns: json['bowlRuns'],
-      bowlWides: json['bowlWides'],
-      bowlWkts: json['bowlWkts'],
-    );
-  }
+  factory BowlerStrike.fromJson(Map<String, dynamic> json) =>
+      _$BowlerStrikeFromJson(json);
+  Map<String, dynamic> toJson() => _$BowlerStrikeToJson(this);
 }

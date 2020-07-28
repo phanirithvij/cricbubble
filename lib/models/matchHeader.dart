@@ -2,7 +2,11 @@ import 'package:cricbubble/models/matchteam.dart';
 import 'package:cricbubble/models/result.dart';
 import 'package:cricbubble/models/team.dart';
 import 'package:cricbubble/models/toss.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'matchHeader.g.dart';
+
+@JsonSerializable(nullable: false)
 class MatchHeader {
   final bool complete;
   final bool dayNight;
@@ -19,9 +23,9 @@ class MatchHeader {
   final List<MatchTeamInfo> matchTeamInfo;
   final String matchType;
   // TODO handle lists
-  final List<String> playersOfTheMatch;
+  final List<MatchPlayer> playersOfTheMatch;
   // TODO handle lists
-  final List<String> playersOfTheSeries;
+  final List<SeriesPlayer> playersOfTheSeries;
   final Result result;
   // TODO class
   final RevisedTarget revisedTarget;
@@ -59,39 +63,12 @@ class MatchHeader {
     this.year,
   });
 
-  factory MatchHeader.fromJson(Map<String, dynamic> json) {
-    return MatchHeader(
-      complete: json['complete'],
-      dayNight: json['dayNight'],
-      dayNumber: json['dayNumber'],
-      domestic: json['domestic'],
-      isMatchNotCovered: json['isMatchNotCovered'],
-      matchCompleteTimestamp: json['matchCompleteTimestamp'],
-      matchDescription: json['matchDescription'],
-      matchFormat: json['matchFormat'],
-      matchId: json['matchId'],
-      matchStartTimestamp: json['matchStartTimestamp'],
-      matchTeamInfo: (json['matchTeamInfo'] as List)
-          .map((x) => MatchTeamInfo.fromJson(x))
-          .toList(),
-      matchType: json['matchType'],
-      playersOfTheMatch:
-          (json['playersOfTheMatch'] as List).map((x) => x as String).toList(),
-      playersOfTheSeries:
-          (json['playersOfTheSeries'] as List).map((x) => x as String).toList(),
-      result: Result.fromJson(json['result']),
-      revisedTarget: RevisedTarget.fromJson(json['revisedTarget']),
-      seriesDesc: json['seriesDesc'],
-      state: json['state'],
-      status: json['status'],
-      team1: Team.fromJson(json['team1']),
-      team2: Team.fromJson(json['team2']),
-      tossResults: TossResults.fromJson(json['tossResults']),
-      year: json['year'],
-    );
-  }
+  factory MatchHeader.fromJson(Map<String, dynamic> json) =>
+      _$MatchHeaderFromJson(json);
+  Map<String, dynamic> toJson() => _$MatchHeaderToJson(this);
 }
 
+@JsonSerializable(nullable: true)
 class RevisedTarget {
   String reason;
 
@@ -99,9 +76,71 @@ class RevisedTarget {
     this.reason,
   });
 
-  factory RevisedTarget.fromJson(Map<String, dynamic> json) {
-    return RevisedTarget(
-      reason: json['reason'],
-    );
-  }
+  factory RevisedTarget.fromJson(Map<String, dynamic> json) =>
+      _$RevisedTargetFromJson(json);
+  Map<String, dynamic> toJson() => _$RevisedTargetToJson(this);
+}
+
+@JsonSerializable(nullable: true)
+class MatchPlayer {
+  final bool captain;
+  final num faceImageId;
+  final String fullName;
+  final num id;
+  final bool keeper;
+  final String name;
+  final String nickName;
+  final bool substitute;
+  final String teamName;
+
+  MatchPlayer({
+    this.captain,
+    this.faceImageId,
+    this.fullName,
+    this.id,
+    this.keeper,
+    this.name,
+    this.nickName,
+    this.substitute,
+    this.teamName,
+  });
+
+  factory MatchPlayer.fromJson(Map<String, dynamic> json) =>
+      _$MatchPlayerFromJson(json);
+  Map<String, dynamic> toJson() => _$MatchPlayerToJson(this);
+}
+
+@JsonSerializable(nullable: true)
+class SeriesPlayer {
+  final String battingStyle;
+  final String bowlingStyle;
+  final bool captain;
+  final num faceImageId;
+  final String fullName;
+  final num id;
+  final bool keeper;
+  final String name;
+  final String nickName;
+  final String role;
+  final num teamId;
+  final String teamName;
+
+  SeriesPlayer({
+    this.fullName,
+    this.id,
+    this.keeper,
+    this.name,
+    this.nickName,
+    this.role,
+    this.teamId,
+    this.teamName,
+    this.battingStyle,
+    this.bowlingStyle,
+    this.captain,
+    this.faceImageId,
+  });
+
+  factory SeriesPlayer.fromJson(Map<String, dynamic> json) =>
+      _$SeriesPlayerFromJson(json);
+  Map<String, dynamic> toJson() => _$SeriesPlayerToJson(this);
 }

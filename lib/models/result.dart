@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'result.g.dart';
+
+@JsonSerializable(nullable: false)
 class Result {
   final bool winByInnings;
   final bool winByRuns;
@@ -9,11 +14,6 @@ class Result {
     this.winningTeam,
   });
 
-  factory Result.fromJson(Map<String, dynamic> json) {
-    return Result(
-      winByInnings: json['winByInnings'],
-      winByRuns: json['winByRuns'],
-      winningTeam: json['winningTeam'],
-    );
-  }
+  factory Result.fromJson(Map<String, dynamic> json) => _$ResultFromJson(json);
+  Map<String, dynamic> toJson() => _$ResultToJson(this);
 }

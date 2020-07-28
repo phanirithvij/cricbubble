@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'batsmanstrike.g.dart';
+
+@JsonSerializable(nullable: true)
 class BatsmanStrike {
   final int batBalls;
   final int batDots;
@@ -21,17 +26,7 @@ class BatsmanStrike {
     this.batStrikeRate,
   });
 
-  factory BatsmanStrike.fromJson(Map<String, dynamic> json) {
-    return BatsmanStrike(
-      batBalls: json['batBalls'],
-      batDots: json['batDots'],
-      batFours: json['batFours'],
-      batId: json['batId'],
-      batMins: json['batMins'],
-      batName: json['batName'],
-      batRuns: json['batRuns'],
-      batSixes: json['batSixes'],
-      batStrikeRate: json['batStrikeRate'],
-    );
-  }
+  factory BatsmanStrike.fromJson(Map<String, dynamic> json) =>
+      _$BatsmanStrikeFromJson(json);
+  Map<String, dynamic> toJson() => _$BatsmanStrikeToJson(this);
 }

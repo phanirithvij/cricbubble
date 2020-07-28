@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'commentarySnippet.g.dart';
+
+@JsonSerializable(nullable: true)
 class CommentarySnippet {
   final num commId;
   final String content;
@@ -22,17 +27,7 @@ class CommentarySnippet {
     this.timestamp,
   });
 
-  factory CommentarySnippet.fromJson(Map<String, dynamic> json) {
-    return CommentarySnippet(
-      commId: json['commId'],
-      content: json['content'],
-      headline: json['headline'],
-      infraType: json['infraType'],
-      inningsId: json['inningsId'],
-      isLive: json['isLive'],
-      matchId: json['matchId'],
-      parsedContent: json['parsedContent'],
-      timestamp: json['timestamp'],
-    );
-  }
+  factory CommentarySnippet.fromJson(Map<String, dynamic> json) =>
+      _$CommentarySnippetFromJson(json);
+  Map<String, dynamic> toJson() => _$CommentarySnippetToJson(this);
 }

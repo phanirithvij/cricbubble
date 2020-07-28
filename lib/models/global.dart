@@ -2,7 +2,11 @@ import 'package:cricbubble/models/commentary.dart';
 import 'package:cricbubble/models/commentarySnippet.dart';
 import 'package:cricbubble/models/matchHeader.dart';
 import 'package:cricbubble/models/matchScore.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'global.g.dart';
+
+@JsonSerializable(nullable: false)
 class GlobalDataModel {
   /* TODO see if types error out */
   final List<Commentary> commentaryList;
@@ -21,18 +25,12 @@ class GlobalDataModel {
     this.page,
   });
 
-  factory GlobalDataModel.fromJson(Map<String, dynamic> json) {
-    return GlobalDataModel(
-      commentaryList: (json['commentaryList'] as List)
-          .map((dynamic x) => Commentary.fromJson(x))
-          .toList(),
-      commentarySnippetList: (json['commentarySnippetList'] as List)
-          .map((dynamic x) => CommentarySnippet.fromJson(x))
-          .toList(),
-      enableNoContent: json['enableNoContent'],
-      matchHeader: MatchHeader.fromJson(json['matchHeader']),
-      miniscore: MiniScore.fromJson(json['miniscore']),
-      page: json['page'],
-    );
+  factory GlobalDataModel.fromJson(Map<String, dynamic> json) =>
+      _$GlobalDataModelFromJson(json);
+  Map<String, dynamic> toJson() => _$GlobalDataModelToJson(this);
+
+  @override
+  String toString() {
+    return "$commentaryList";
   }
 }

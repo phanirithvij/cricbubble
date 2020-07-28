@@ -1,7 +1,11 @@
 import 'package:cricbubble/models/batsmanstrike.dart';
 import 'package:cricbubble/models/bowlerstrike.dart';
 import 'package:cricbubble/models/oversep.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'commentary.g.dart';
+
+@JsonSerializable(nullable: false)
 class Commentary {
   final int ballNbr;
   final String batTeamName;
@@ -16,6 +20,7 @@ class Commentary {
   final String event;
   final int inningsId;
   final int timestamp;
+  @JsonKey(nullable: true)
   final OverSeparator overSeperator;
 
   Commentary({
@@ -31,24 +36,12 @@ class Commentary {
     this.overSeperator,
   });
 
-  factory Commentary.fromJson(Map<String, dynamic> json) {
-    return Commentary(
-      ballNbr: json['ballNbr'],
-      batTeamName: json['batTeamName'],
-      batsmanStriker: json['batsmanStriker'] != null
-          ? BatsmanStrike.fromJson(json['batsmanStriker'])
-          : null,
-      bowlerStriker: json['bowlerStriker'] != null
-          ? BowlerStrike.fromJson(json['bowlerStriker'])
-          : null,
-      commText: json['commText'],
-      commentaryFormats: json['commentaryFormats'],
-      event: json['event'],
-      inningsId: json['inningsId'],
-      timestamp: json['timestamp'],
-      overSeperator: (json['overSeperator'] != null)
-          ? OverSeparator.fromJson(json['overSeperator'])
-          : null,
-    );
+  factory Commentary.fromJson(Map<String, dynamic> json) =>
+      _$CommentaryFromJson(json);
+  Map<String, dynamic> toJson() => _$CommentaryToJson(this);
+
+  @override
+  String toString() {
+    return commText;
   }
 }

@@ -8,13 +8,16 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  http:
+  http: ^0.12.2
+  json_annotation:
   flutter:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  json_serializable: ^3.3.0
+  build_runner:
 
 flutter:
   uses-material-design: true

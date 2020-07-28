@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'latestperformance.g.dart';
+
+@JsonSerializable(nullable: true)
 class LatestPerformance {
   final String label;
   final int runs;
@@ -9,11 +14,7 @@ class LatestPerformance {
     this.wkts,
   });
 
-  factory LatestPerformance.fromJson(Map<String, dynamic> json) {
-    return LatestPerformance(
-      label: json['label'],
-      runs: json['runs'],
-      wkts: json['wkts'],
-    );
-  }
+  factory LatestPerformance.fromJson(Map<String, dynamic> json) =>
+      _$LatestPerformanceFromJson(json);
+  Map<String, dynamic> toJson() => _$LatestPerformanceToJson(this);
 }
