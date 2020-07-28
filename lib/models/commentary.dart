@@ -1,24 +1,48 @@
+import 'package:cricbubble/models/batsmanstrike.dart';
+import 'package:cricbubble/models/bowlerstrike.dart';
+import 'package:cricbubble/models/oversep.dart';
+
 class Commentary {
   final int ballNbr;
   final String batTeamName;
-  final Map<String, Object> batsmanStriker;
-  final Map<String, Object> bowlerStriker;
+
+  final BatsmanStrike batsmanStriker;
+  final BowlerStrike bowlerStriker;
+
   final String commText;
+
+  // TODO
   final Map commentaryFormats;
   final String event;
   final int inningsId;
   final int timestamp;
-  final Map overSeperator;
+  final OverSeparator overSeperator;
 
-  Commentary(
-      this.ballNbr,
-      this.batTeamName,
-      this.batsmanStriker,
-      this.bowlerStriker,
-      this.commText,
-      this.commentaryFormats,
-      this.event,
-      this.inningsId,
-      this.timestamp,
-      this.overSeperator);
+  Commentary({
+    this.ballNbr,
+    this.batTeamName,
+    this.batsmanStriker,
+    this.bowlerStriker,
+    this.commText,
+    this.commentaryFormats,
+    this.event,
+    this.inningsId,
+    this.timestamp,
+    this.overSeperator,
+  });
+
+  factory Commentary.fromJson(Map<String, dynamic> json) {
+    return Commentary(
+      ballNbr: json['ballNbr'],
+      batTeamName: json['batTeamName'],
+      batsmanStriker: BatsmanStrike.fromJson(json['batsmanStriker']),
+      bowlerStriker: BowlerStrike.fromJson(json['bowlerStriker']),
+      commText: json['commText'],
+      commentaryFormats: json['commentaryFormats'],
+      event: json['event'],
+      inningsId: json['inningsId'],
+      timestamp: json['timestamp'],
+      overSeperator: OverSeparator.fromJson(json['overSeperator']),
+    );
+  }
 }

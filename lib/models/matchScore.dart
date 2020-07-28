@@ -6,24 +6,19 @@ import 'package:cricbubble/models/matchscoredetails.dart';
 class MiniScore {
   // TODO
   final Map<String, num> batTeam;
-  // TODO
   final BatsmanStrike batsmanNonStriker;
-  // TODO
   final BatsmanStrike batsmanStriker;
-  // TODO
   final BowlerStrike bowlerNonStriker;
-  // TODO
   final BowlerStrike bowlerStriker;
   final double currentRunRate;
   final int inningsId;
-  // TODO
   final List<LatestPerformance> latestPerformance;
-  // TODO
   final MatchScoreDetails matchScoreDetails;
   //TODO (List type not known)
   final List overSummaryList;
   final double overs;
   final int oversRem;
+  // TODO
   final Map<String, int> partnerShip;
   // TODO (Map intri not known)
   final Map ppData;

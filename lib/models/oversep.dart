@@ -16,7 +16,7 @@ class OverSeparator {
   final int bowlWickets;
   final String event;
   final int inningsId;
-  // o_summary
+  // json o_summary
   final String overSummary;
   final double overNum;
   final int runs;
@@ -56,9 +56,9 @@ class OverSeparator {
       batNonStrikerIds: json['batNonStrikerIds'],
       batNonStrikerNames: json['batNonStrikerNames'],
       batNonStrikerRuns: json['batNonStrikerRuns'],
-      batStrikerBalls: json['batNonStrikerBalls'],
+      batStrikerBalls: json['batStrikerBalls'],
       batStrikerIds: json['batStrikerIds'],
-      batStrikerNames: json['batNonStrikerBalls'],
+      batStrikerNames: json['batStrikerNames'],
       batStrikerRuns: json['batStrikerRuns'],
       batTeamName: json['batTeamName'],
       bowlIds: json['bowlIds'],
@@ -69,7 +69,7 @@ class OverSeparator {
       bowlWickets: json['bowlWickets'],
       event: json['event'],
       inningsId: json['inningsId'],
-      overSummary: json['overSummary'],
+      overSummary: json['o_summary'],
       overNum: json['overNum'],
       runs: json['runs'],
       score: json['score'],

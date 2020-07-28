@@ -4,6 +4,7 @@ import 'package:cricbubble/models/matchHeader.dart';
 import 'package:cricbubble/models/matchScore.dart';
 
 class GlobalDataModel {
+  /* TODO see if types error out */
   final List<Commentary> commentaryList;
   final List<CommentarySnippet> commentarySnippetList;
   final bool enableNoContent;
@@ -22,11 +23,15 @@ class GlobalDataModel {
 
   factory GlobalDataModel.fromJson(Map<String, dynamic> json) {
     return GlobalDataModel(
-      commentaryList: json['commentaryList'],
-      commentarySnippetList: json['commentarySnippetList'],
+      commentaryList: (json['commentaryList'] as List)
+          .map((dynamic x) => Commentary.fromJson(x))
+          .toList(),
+      commentarySnippetList: (json['commentarySnippetList'] as List)
+          .map((dynamic x) => CommentarySnippet.fromJson(x))
+          .toList(),
       enableNoContent: json['enableNoContent'],
-      matchHeader: json['matchHeader'],
-      miniscore: json['miniscore'],
+      matchHeader: MatchHeader.fromJson(json['matchHeader']),
+      miniscore: MiniScore.fromJson(json['miniscore']),
       page: json['page'],
     );
   }

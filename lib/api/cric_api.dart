@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cricbubble/models/global.dart';
 import 'package:http/http.dart' as http;
 
 class CricbuzzAPI {
@@ -9,9 +12,8 @@ class CricbuzzAPI {
     return url.split('/')[4];
   }
 
-  static Future<Map> getUpdates(String matchID) async {
+  static Future<GlobalDataModel> getUpdates(String matchID) async {
     var data = await http.get(CricbuzzAPI.API_URL + matchID);
-    print(data.body);
-    return {};
+    return GlobalDataModel.fromJson(json.decode(data.body));
   }
 }

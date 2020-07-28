@@ -15,11 +15,15 @@ class MatchHeader {
   final int matchId;
   // TODO timestamps verify later(int/not)
   final num matchStartTimestamp;
+  // TODO handle lists
   final List<MatchTeamInfo> matchTeamInfo;
   final String matchType;
+  // TODO handle lists
   final List<String> playersOfTheMatch;
+  // TODO handle lists
   final List<String> playersOfTheSeries;
   final Result result;
+  // TODO ??
   final Map<String, String> revisedTarget;
   final String seriesDesc;
   final String state;
@@ -71,14 +75,14 @@ class MatchHeader {
       matchType: json['matchType'],
       playersOfTheMatch: json['playersOfTheMatch'],
       playersOfTheSeries: json['playersOfTheSeries'],
-      result: json['result'],
+      result: Result.fromJson(json['result']),
       revisedTarget: json['revisedTarget'],
       seriesDesc: json['seriesDesc'],
       state: json['state'],
       status: json['status'],
-      team1: json['team1'],
-      team2: json['team2'],
-      tossResults: json['tossResults'],
+      team1: Team.fromJson(json['team1']),
+      team2: Team.fromJson(json['team2']),
+      tossResults: TossResults.fromJson(json['tossResults']),
       year: json['year'],
     );
   }
