@@ -35,14 +35,20 @@ class Commentary {
     return Commentary(
       ballNbr: json['ballNbr'],
       batTeamName: json['batTeamName'],
-      batsmanStriker: BatsmanStrike.fromJson(json['batsmanStriker']),
-      bowlerStriker: BowlerStrike.fromJson(json['bowlerStriker']),
+      batsmanStriker: json['batsmanStriker'] != null
+          ? BatsmanStrike.fromJson(json['batsmanStriker'])
+          : null,
+      bowlerStriker: json['bowlerStriker'] != null
+          ? BowlerStrike.fromJson(json['bowlerStriker'])
+          : null,
       commText: json['commText'],
       commentaryFormats: json['commentaryFormats'],
       event: json['event'],
       inningsId: json['inningsId'],
       timestamp: json['timestamp'],
-      overSeperator: OverSeparator.fromJson(json['overSeperator']),
+      overSeperator: (json['overSeperator'] != null)
+          ? OverSeparator.fromJson(json['overSeperator'])
+          : null,
     );
   }
 }

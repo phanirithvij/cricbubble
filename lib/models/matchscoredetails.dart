@@ -21,7 +21,9 @@ class MatchScoreDetails {
     return MatchScoreDetails(
       customStatus: json['customStatus'],
       highlightedTeamId: json['highlightedTeamId'],
-      inningsScoreList: json['inningsScoreList'],
+      inningsScoreList: (json['inningsScoreList'] as List)
+          .map((x) => InningsScore.fromJson(x))
+          .toList(),
       isMatchNotCovered: json['isMatchNotCovered'],
       matchFormat: json['matchFormat'],
       matchId: json['matchId'],

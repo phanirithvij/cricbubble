@@ -23,8 +23,8 @@ class MatchHeader {
   // TODO handle lists
   final List<String> playersOfTheSeries;
   final Result result;
-  // TODO ??
-  final Map<String, String> revisedTarget;
+  // TODO class
+  final RevisedTarget revisedTarget;
   final String seriesDesc;
   final String state;
   final String status;
@@ -71,12 +71,16 @@ class MatchHeader {
       matchFormat: json['matchFormat'],
       matchId: json['matchId'],
       matchStartTimestamp: json['matchStartTimestamp'],
-      matchTeamInfo: json['matchTeamInfo'],
+      matchTeamInfo: (json['matchTeamInfo'] as List)
+          .map((x) => MatchTeamInfo.fromJson(x))
+          .toList(),
       matchType: json['matchType'],
-      playersOfTheMatch: json['playersOfTheMatch'],
-      playersOfTheSeries: json['playersOfTheSeries'],
+      playersOfTheMatch:
+          (json['playersOfTheMatch'] as List).map((x) => x as String).toList(),
+      playersOfTheSeries:
+          (json['playersOfTheSeries'] as List).map((x) => x as String).toList(),
       result: Result.fromJson(json['result']),
-      revisedTarget: json['revisedTarget'],
+      revisedTarget: RevisedTarget.fromJson(json['revisedTarget']),
       seriesDesc: json['seriesDesc'],
       state: json['state'],
       status: json['status'],
@@ -84,6 +88,20 @@ class MatchHeader {
       team2: Team.fromJson(json['team2']),
       tossResults: TossResults.fromJson(json['tossResults']),
       year: json['year'],
+    );
+  }
+}
+
+class RevisedTarget {
+  String reason;
+
+  RevisedTarget({
+    this.reason,
+  });
+
+  factory RevisedTarget.fromJson(Map<String, dynamic> json) {
+    return RevisedTarget(
+      reason: json['reason'],
     );
   }
 }

@@ -4,7 +4,7 @@ class BowlerStrike {
   final int bowlMaidens;
   final String bowlName;
   final int bowlNoballs;
-  final int bowlOvs;
+  final double bowlOvs;
   final int bowlRuns;
   final int bowlWides;
   final int bowlWkts;

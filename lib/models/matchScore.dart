@@ -1,11 +1,11 @@
 import 'package:cricbubble/models/batsmanstrike.dart';
+import 'package:cricbubble/models/batteam.dart';
 import 'package:cricbubble/models/bowlerstrike.dart';
 import 'package:cricbubble/models/latestperformance.dart';
 import 'package:cricbubble/models/matchscoredetails.dart';
 
 class MiniScore {
-  // TODO
-  final Map<String, num> batTeam;
+  final BatTeam batTeam;
   final BatsmanStrike batsmanNonStriker;
   final BatsmanStrike batsmanStriker;
   final BowlerStrike bowlerNonStriker;
@@ -19,7 +19,7 @@ class MiniScore {
   final double overs;
   final int oversRem;
   // TODO
-  final Map<String, int> partnerShip;
+  final Map partnerShip;
   // TODO (Map intri not known)
   final Map ppData;
   final String recentOvsStats;
@@ -47,15 +47,17 @@ class MiniScore {
   });
   factory MiniScore.fromJson(Map<String, dynamic> json) {
     return MiniScore(
-      batTeam: json['batTeam'],
-      batsmanNonStriker: json['batsmanNonStriker'],
-      batsmanStriker: json['batsmanStriker'],
-      bowlerNonStriker: json['bowlerNonStriker'],
-      bowlerStriker: json['bowlerStriker'],
+      batTeam: BatTeam.fromJson(json['batTeam']),
+      batsmanNonStriker: BatsmanStrike.fromJson(json['batsmanNonStriker']),
+      batsmanStriker: BatsmanStrike.fromJson(json['batsmanStriker']),
+      bowlerNonStriker: BowlerStrike.fromJson(json['bowlerNonStriker']),
+      bowlerStriker: BowlerStrike.fromJson(json['bowlerStriker']),
       currentRunRate: json['currentRunRate'],
       inningsId: json['inningsId'],
-      latestPerformance: json['latestPerformance'],
-      matchScoreDetails: json['matchScoreDetails'],
+      latestPerformance: (json['latestPerformance'] as List)
+          .map((x) => LatestPerformance.fromJson(x))
+          .toList(),
+      matchScoreDetails: MatchScoreDetails.fromJson(json['matchScoreDetails']),
       overSummaryList: json['overSummaryList'],
       overs: json['overs'],
       oversRem: json['oversRem'],
