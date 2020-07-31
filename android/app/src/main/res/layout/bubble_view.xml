@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.txusballesteros.bubbles.BubbleLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:background="@drawable/launch_background"
+        android:src="@drawable/launch_background"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/desc_image" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_blue_bright"
+        android:textSize="15sp"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:background="@drawable/launch_background"
+        android:text="@string/_1"
+        android:layout_marginStart="2dp" />
+
+</com.txusballesteros.bubbles.BubbleLayout>
