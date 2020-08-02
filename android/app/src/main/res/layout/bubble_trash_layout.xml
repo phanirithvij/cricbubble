@@ -4,5 +4,5 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|center_horizontal"
     android:layout_marginBottom="20dp"
-    android:contentDescription="@string/desc_image"
-    android:src="@mipmap/ic_launcher" />
+    android:contentDescription="@string/trash"
+    android:src="@mipmap/bubble_trash_background" />

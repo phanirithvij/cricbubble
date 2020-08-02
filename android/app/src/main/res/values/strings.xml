@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="_1">1</string>
-    <string name="desc_image">suck it</string>
+    <string name="desc_image">drag here to close floating icon</string>
+    <string name="trash">drag here to close floating icon</string>
 </resources>

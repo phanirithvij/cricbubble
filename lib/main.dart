@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cricbubble/api/cric_api.dart';
 
 const sampleMatch =
@@ -6,10 +8,7 @@ const sampleMatch =
 
 void main() {
   var matchID = CricbuzzAPI.getMatchIdfromURL(sampleMatch);
-  CricbuzzAPI.getUpdates(matchID).then((value) {
-    // hahahaha
-    print(value);
-  });
+  CricbuzzAPI.getUpdates(matchID).then((value) => print(value));
   runApp(MyApp());
 }
 
@@ -37,12 +36,35 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static const String _channel = 'increment';
+  static const String _emptyMessage = '';
+  static const BasicMessageChannel<String> platform =
+      BasicMessageChannel<String>(_channel, StringCodec());
+
   int _counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    platform.setMessageHandler(_handlePlatformIncrement);
+  }
+
+  Future<String> _handlePlatformIncrement(String message) async {
+    setState(() {
+      _counter++;
+    });
+    return _emptyMessage;
+  }
+
+  void _sendFlutterIncrement() {
+    platform.send('_pong');
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+    _sendFlutterIncrement();
   }
 
   @override
