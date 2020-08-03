@@ -36,6 +36,7 @@ public class BubblesManager {
     private boolean bounded;
     private BubblesService bubblesService;
     private int trashLayoutResourceId;
+    private int previewResourceId;
     private OnInitializedCallback listener;
 
     private static BubblesManager getInstance(Context context) {
@@ -48,7 +49,7 @@ public class BubblesManager {
     private ServiceConnection bubbleServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            BubblesService.BubblesServiceBinder binder = (BubblesService.BubblesServiceBinder)service;
+            BubblesService.BubblesServiceBinder binder = (BubblesService.BubblesServiceBinder) service;
             BubblesManager.this.bubblesService = binder.getService();
             configureBubblesService();
             bounded = true;
@@ -69,6 +70,7 @@ public class BubblesManager {
 
     private void configureBubblesService() {
         bubblesService.addTrash(trashLayoutResourceId);
+        bubblesService.addPreview(previewResourceId);
     }
 
     public void initialize() {
@@ -105,8 +107,13 @@ public class BubblesManager {
             return this;
         }
 
+        public Builder setPreviewLayout(int p) {
+            bubblesManager.previewResourceId = p;
+            return this;
+        }
+
         public Builder setTrashLayout(int trashLayoutResourceId) {
-            bubblesManager.trashLayoutResourceId =trashLayoutResourceId;
+            bubblesManager.trashLayoutResourceId = trashLayoutResourceId;
             return this;
         }
 

@@ -62,11 +62,11 @@ class BubbleBaseLayout extends FrameLayout {
         super(context);
     }
 
-    public BubbleBaseLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
 
     public BubbleBaseLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }    public BubbleBaseLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
+
 }

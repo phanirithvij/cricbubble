@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.txusballesteros.bubbles.BubbleLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.txusballesteros.bubbles.BubbleLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bubble_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false">
 
-    <ImageView
-        android:id="@+id/avatar"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_gravity="center"
-        android:background="@android:color/background_dark"
-        android:src="@android:color/holo_blue_dark"
-        android:scaleType="centerCrop"
-        android:contentDescription="@string/desc_image" />
+        android:src="@mipmap/ic_launcher"
+        app:civ_border_color="#FF000000"
+        app:civ_border_width="2dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_blue_bright"
-        android:textSize="15sp"
-        android:layout_marginTop="2dp"
+        android:layout_marginStart="2dp"
         android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:background="@android:color/background_dark"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:background="@android:color/background_dark"
         android:text="@string/_1"
-        android:layout_marginStart="2dp" />
+        android:textColor="@android:color/holo_blue_bright"
+        android:textSize="15sp" />
+
 
 </com.txusballesteros.bubbles.BubbleLayout>

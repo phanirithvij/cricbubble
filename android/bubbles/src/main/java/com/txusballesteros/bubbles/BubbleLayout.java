@@ -132,6 +132,10 @@ public class BubbleLayout extends BubbleBaseLayout {
                     if (System.currentTimeMillis() - lastTouchDown < TOUCH_TIME_THRESHOLD) {
                         if (onBubbleClickListener != null) {
                             onBubbleClickListener.onBubbleClick(this);
+                            if (getLayoutCoordinator() != null) {
+                                getLayoutCoordinator().notifyPreviewVisibilityListener();
+                            }
+
                         }
                     }
                     break;
@@ -174,7 +178,6 @@ public class BubbleLayout extends BubbleBaseLayout {
         Point size = new Point();
         display.getSize(size);
         width = (size.x - this.getWidth());
-
     }
 
     public interface OnBubbleRemoveListener {

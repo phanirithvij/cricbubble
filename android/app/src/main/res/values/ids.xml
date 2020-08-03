@@ -2,5 +2,6 @@
 <resources>
     <item name="flutter_view" type="id" />
     <item name="root_view" type="id" />
+    <item name="bubble_view" type="id" />
     <item name="flutter_view_parent" type="id" />
 </resources>

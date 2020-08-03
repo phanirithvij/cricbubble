@@ -24,14 +24,13 @@
  */
 package com.txusballesteros.bubbles;
 
-import android.content.Context;
-import android.os.Vibrator;
 import android.view.View;
 import android.view.WindowManager;
 
 final class BubblesLayoutCoordinator {
     private static BubblesLayoutCoordinator INSTANCE;
     private BubbleTrashLayout trashView;
+    private BubblePreviewLayout preView;
     private WindowManager windowManager;
     private BubblesService bubblesService;
 
@@ -42,9 +41,10 @@ final class BubblesLayoutCoordinator {
         return INSTANCE;
     }
 
-    private BubblesLayoutCoordinator() { }
+    private BubblesLayoutCoordinator() {
+    }
 
-    public void notifyBubblePositionChanged(BubbleLayout bubble, int x, int y) {
+    void notifyBubblePositionChanged(BubbleLayout bubble, int x, int y) {
         if (trashView != null) {
             trashView.setVisibility(View.VISIBLE);
             if (checkIfBubbleIsOverTrash(bubble)) {
@@ -55,6 +55,12 @@ final class BubblesLayoutCoordinator {
                 trashView.releaseMagnetism();
             }
         }
+    }
+
+    void notifyPreviewVisibilityListener() {
+        // toggle visibility??
+        if (preView != null)
+            preView.toggleVisibility();
     }
 
     private void applyTrashMagnetismToBubble(BubbleLayout bubble) {
@@ -93,7 +99,7 @@ final class BubblesLayoutCoordinator {
         return result;
     }
 
-    public void notifyBubbleRelease(BubbleLayout bubble) {
+    void notifyBubbleRelease(BubbleLayout bubble) {
         if (trashView != null) {
             if (checkIfBubbleIsOverTrash(bubble)) {
                 bubblesService.removeBubble(bubble);
@@ -102,25 +108,30 @@ final class BubblesLayoutCoordinator {
         }
     }
 
-    public static class Builder {
+    static class Builder {
         private BubblesLayoutCoordinator layoutCoordinator;
 
-        public Builder(BubblesService service) {
+        Builder(BubblesService service) {
             layoutCoordinator = getInstance();
             layoutCoordinator.bubblesService = service;
         }
 
-        public Builder setTrashView(BubbleTrashLayout trashView) {
+        Builder setTrashView(BubbleTrashLayout trashView) {
             layoutCoordinator.trashView = trashView;
             return this;
         }
 
-        public Builder setWindowManager(WindowManager windowManager) {
+        Builder setPreviewView(BubblePreviewLayout preview) {
+            layoutCoordinator.preView = preview;
+            return this;
+        }
+
+        Builder setWindowManager(WindowManager windowManager) {
             layoutCoordinator.windowManager = windowManager;
             return this;
         }
 
-        public BubblesLayoutCoordinator build() {
+        BubblesLayoutCoordinator build() {
             return layoutCoordinator;
         }
     }

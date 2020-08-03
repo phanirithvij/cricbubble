@@ -27,7 +27,6 @@ package com.txusballesteros.bubbles;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -37,7 +36,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +44,7 @@ public class BubblesService extends Service {
     private BubblesServiceBinder binder = new BubblesServiceBinder();
     private List<BubbleLayout> bubbles = new ArrayList<>();
     private BubbleTrashLayout bubblesTrash;
+    private BubblePreviewLayout bubblePreview;
     private WindowManager windowManager;
     private BubblesLayoutCoordinator layoutCoordinator;
 
@@ -81,7 +80,7 @@ public class BubblesService extends Service {
 
     private WindowManager getWindowManager() {
         if (windowManager == null) {
-            windowManager = (WindowManager)getSystemService(WINDOW_SERVICE);
+            windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         }
         return windowManager;
     }
@@ -107,10 +106,24 @@ public class BubblesService extends Service {
         }
     }
 
+    void addPreview(int previewId) {
+        if (previewId != 0) {
+            bubblePreview = new BubblePreviewLayout(this);
+            bubblePreview.setWindowManager(windowManager);
+            bubblePreview.setViewParams(buildLayoutParamsForTrash());
+            // onclick toggle visibility
+            bubblePreview.setVisibility(View.VISIBLE);
+            LayoutInflater.from(this).inflate(previewId, bubblePreview, true);
+            addViewToWindow(bubblePreview);
+            initializeLayoutCoordinator();
+        }
+    }
+
     private void initializeLayoutCoordinator() {
         layoutCoordinator = new BubblesLayoutCoordinator.Builder(this)
                 .setWindowManager(getWindowManager())
                 .setTrashView(bubblesTrash)
+                .setPreviewView(bubblePreview)
                 .build();
     }
 
@@ -122,7 +135,9 @@ public class BubblesService extends Service {
             }
         });
     }
+
     WindowManager.LayoutParams params;
+
     private WindowManager.LayoutParams buildLayoutParamsForBubble(int x, int y) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params = new WindowManager.LayoutParams(
@@ -173,8 +188,8 @@ public class BubblesService extends Service {
         recycleBubble(bubble);
     }
 
-    public class BubblesServiceBinder extends Binder {
-        public BubblesService getService() {
+    class BubblesServiceBinder extends Binder {
+        BubblesService getService() {
             return BubblesService.this;
         }
     }
