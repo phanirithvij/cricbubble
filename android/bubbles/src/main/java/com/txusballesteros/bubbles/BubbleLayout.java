@@ -30,9 +30,9 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,6 +52,8 @@ public class BubbleLayout extends BubbleBaseLayout {
     private int height;
     private float prevX;
     private float prevY;
+    private float prevRawX;
+    private float prevRawY;
     private WindowManager windowManager;
     private boolean shouldStickToWall = true;
 
@@ -107,6 +109,7 @@ public class BubbleLayout extends BubbleBaseLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event != null) {
+            Log.d("BubbleLayout", event.toString());
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     initialX = getViewParams().x;
@@ -125,9 +128,13 @@ public class BubbleLayout extends BubbleBaseLayout {
                     getViewParams().y = y;
                     getWindowManager().updateViewLayout(this, getViewParams());
                     if (getLayoutCoordinator() != null) {
-                        getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
+                        float dx = (prevRawX - event.getRawX());
+                        float dy = (prevRawY - event.getRawY());
+                        if (dx * dx + dy * dy > 2) {
+                            getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
 //                        TODO bug fix click to toggle not working
-                        getLayoutCoordinator().setPreViewVisibility(GONE);
+                            getLayoutCoordinator().hidePreview();
+                        }
                     }
                     break;
                 case MotionEvent.ACTION_UP:
@@ -142,14 +149,22 @@ public class BubbleLayout extends BubbleBaseLayout {
                             if (getLayoutCoordinator() != null) {
                                 getLayoutCoordinator().notifyPreviewVisibilityListener();
                                 moveUponPreview();
-                                // save current position of bubble before moving
                             }
                         }
                     }
                     break;
             }
+            prevRawX = event.getRawX();
+            prevRawY = event.getRawY();
         }
+        performClick();
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        Log.d("BubblesLayout", "Perform Click");
+        return super.performClick();
     }
 
     private void playAnimation() {
@@ -187,9 +202,6 @@ public class BubbleLayout extends BubbleBaseLayout {
         display.getSize(size);
         width = (size.x - this.getWidth());
         height = (size.y - this.getHeight());
-// todo set prevx and prevy to the bubble initialization coordinates
-//        prevX = 0;
-//        prevY = 0;
     }
 
     public interface OnBubbleRemoveListener {
@@ -209,20 +221,19 @@ public class BubbleLayout extends BubbleBaseLayout {
     }
 
     public void moveUponPreview() {
-        int middle = height / 2;
+        int middleY = height / 2;
         int middleX = width / 2;
         int visibility = getLayoutCoordinator().getPreViewVisibility();
         float nearestW;
         float nearestFC;
         // View.VISIBLE because we are calling this function after calling toggleVisibility
-        if(visibility == View.VISIBLE) {
+        if (visibility == View.VISIBLE) {
             prevX = getViewParams().x;
             prevY = getViewParams().y;
-            nearestFC = getViewParams().y >= middle ? height : 0;
+            nearestFC = getViewParams().y >= middleY ? height-20 : 20;
             nearestW = getViewParams().x >= middleX ? width : 0;
             animator.start(nearestW, nearestFC);
-        }
-        else {
+        } else {
             animator.start(prevX, prevY);
         }
     }

@@ -74,13 +74,13 @@ class BubblePreviewLayout extends BubbleBaseLayout {
         if (attachedToWindow) {
             if (visibility != getVisibility()) {
                 if (visibility == VISIBLE) {
-                    Log.d("Ok", "Ok");
+                    Log.d("Ok", "Visible");
 //                    todo show some animation for preview opening
 //                    playAnimation(R.animator.bubble_trash_shown_animator);
                 } else {
 //                    todo show some animation for preview closing
 //                    playAnimation(R.animator.bubble_trash_hide_animator);
-                    Log.d("Ok", "Ok");
+                    Log.d("Ok", "Not visible");
                 }
             }
         }
