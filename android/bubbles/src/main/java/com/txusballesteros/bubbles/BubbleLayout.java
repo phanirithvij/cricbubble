@@ -210,13 +210,17 @@ public class BubbleLayout extends BubbleBaseLayout {
 
     public void moveUponPreview() {
         int middle = height / 2;
+        int middleX = width / 2;
         int visibility = getLayoutCoordinator().getPreViewVisibility();
+        float nearestW;
         float nearestFC;
+        // View.VISIBLE because we are calling this function after calling toggleVisibility
         if(visibility == View.VISIBLE) {
             prevX = getViewParams().x;
             prevY = getViewParams().y;
             nearestFC = getViewParams().y >= middle ? height : 0;
-            animator.start(getViewParams().x, nearestFC);
+            nearestW = getViewParams().x >= middleX ? width : 0;
+            animator.start(nearestW, nearestFC);
         }
         else {
             animator.start(prevX, prevY);
