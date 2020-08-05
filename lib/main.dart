@@ -93,15 +93,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: TextField(
                 decoration: InputDecoration(
-                    border: InputBorder.none,
-                    icon: Icon(
-                      Icons.search,
-                      color: Color.fromRGBO(159, 159, 159, 1),
-                    ),
-                    hintText: "Search",
-                    hintStyle: TextStyle(
-                      color: Color.fromRGBO(159, 159, 159, 1),
-                    )),
+                  border: InputBorder.none,
+                  icon: Icon(
+                    Icons.search,
+                    color: Color.fromRGBO(159, 159, 159, 1),
+                  ),
+                  hintText: "Search",
+                  hintStyle: TextStyle(
+                    color: Color.fromRGBO(159, 159, 159, 1),
+                  ),
+                ),
               ),
             ),
           ),
@@ -243,6 +244,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _incrementCounter();
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
