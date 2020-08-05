@@ -110,7 +110,7 @@ public class BubblesService extends Service {
         if (previewId != 0) {
             bubblePreview = new BubblePreviewLayout(this);
             bubblePreview.setWindowManager(windowManager);
-            bubblePreview.setViewParams(buildLayoutParamsForTrash());
+            bubblePreview.setViewParams(buildLayoutParamsForPreview());
             // onclick toggle visibility
             bubblePreview.setVisibility(View.VISIBLE);
             LayoutInflater.from(this).inflate(previewId, bubblePreview, true);
@@ -179,6 +179,32 @@ public class BubblesService extends Service {
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSPARENT);
         }
+        params.x = x;
+        params.y = y;
+        return params;
+    }
+
+    private WindowManager.LayoutParams buildLayoutParamsForPreview() {
+        // TODO get screen dimens and place this accordingly
+        int x = 100;
+        int y = 360;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        } else {
+            // TODO check for < O android versions
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSPARENT);
+        }
+        params.gravity = Gravity.TOP | Gravity.START;
         params.x = x;
         params.y = y;
         return params;

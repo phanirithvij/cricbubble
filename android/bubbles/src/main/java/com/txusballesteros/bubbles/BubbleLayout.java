@@ -30,10 +30,12 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 
 public class BubbleLayout extends BubbleBaseLayout {
@@ -47,6 +49,9 @@ public class BubbleLayout extends BubbleBaseLayout {
     private long lastTouchDown;
     private MoveAnimator animator;
     private int width;
+    private int height;
+    private float prevX;
+    private float prevY;
     private WindowManager windowManager;
     private boolean shouldStickToWall = true;
 
@@ -114,13 +119,15 @@ public class BubbleLayout extends BubbleBaseLayout {
                     animator.stop();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    int x = initialX + (int)(event.getRawX() - initialTouchX);
-                    int y = initialY + (int)(event.getRawY() - initialTouchY);
+                    int x = initialX + (int) (event.getRawX() - initialTouchX);
+                    int y = initialY + (int) (event.getRawY() - initialTouchY);
                     getViewParams().x = x;
                     getViewParams().y = y;
                     getWindowManager().updateViewLayout(this, getViewParams());
                     if (getLayoutCoordinator() != null) {
                         getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
+//                        TODO bug fix click to toggle not working
+                        getLayoutCoordinator().setPreViewVisibility(GONE);
                     }
                     break;
                 case MotionEvent.ACTION_UP:
@@ -134,8 +141,9 @@ public class BubbleLayout extends BubbleBaseLayout {
                             onBubbleClickListener.onBubbleClick(this);
                             if (getLayoutCoordinator() != null) {
                                 getLayoutCoordinator().notifyPreviewVisibilityListener();
+                                moveUponPreview();
+                                // save current position of bubble before moving
                             }
-
                         }
                     }
                     break;
@@ -178,6 +186,10 @@ public class BubbleLayout extends BubbleBaseLayout {
         Point size = new Point();
         display.getSize(size);
         width = (size.x - this.getWidth());
+        height = (size.y - this.getHeight());
+// todo set prevx and prevy to the bubble initialization coordinates
+//        prevX = 0;
+//        prevY = 0;
     }
 
     public interface OnBubbleRemoveListener {
@@ -189,10 +201,25 @@ public class BubbleLayout extends BubbleBaseLayout {
     }
 
     public void goToWall() {
-        if(shouldStickToWall){
+        if (shouldStickToWall) {
             int middle = width / 2;
             float nearestXWall = getViewParams().x >= middle ? width : 0;
             animator.start(nearestXWall, getViewParams().y);
+        }
+    }
+
+    public void moveUponPreview() {
+        int middle = height / 2;
+        int visibility = getLayoutCoordinator().getPreViewVisibility();
+        float nearestFC;
+        if(visibility == View.VISIBLE) {
+            prevX = getViewParams().x;
+            prevY = getViewParams().y;
+            nearestFC = getViewParams().y >= middle ? height : 0;
+            animator.start(getViewParams().x, nearestFC);
+        }
+        else {
+            animator.start(prevX, prevY);
         }
     }
 
@@ -220,8 +247,8 @@ public class BubbleLayout extends BubbleBaseLayout {
         public void run() {
             if (getRootView() != null && getRootView().getParent() != null) {
                 float progress = Math.min(1, (System.currentTimeMillis() - startingTime) / 400f);
-                float deltaX = (destinationX -  getViewParams().x) * progress;
-                float deltaY = (destinationY -  getViewParams().y) * progress;
+                float deltaX = (destinationX - getViewParams().x) * progress;
+                float deltaY = (destinationY - getViewParams().y) * progress;
                 move(deltaX, deltaY);
                 if (progress < 1) {
                     handler.post(this);

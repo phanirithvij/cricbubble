@@ -57,6 +57,14 @@ final class BubblesLayoutCoordinator {
         }
     }
 
+    void setPreViewVisibility(int visibility) {
+        preView.setVisibility(visibility);
+    }
+
+    int getPreViewVisibility() {
+        return preView.getVisibility();
+    }
+
     void notifyPreviewVisibilityListener() {
         // toggle visibility??
         if (preView != null)

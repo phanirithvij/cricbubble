@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.txusballesteros.bubbles.BubbleLayout
 import com.txusballesteros.bubbles.BubblesManager
 import de.hdodenhof.circleimageview.CircleImageView
-import io.flutter.embedding.android.FlutterSurfaceView
 import io.flutter.embedding.android.FlutterView
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
@@ -58,14 +57,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.app_layout)
         this.supportActionBar?.hide()
 
-//        val root = findViewById<ConstraintLayout>(R.id.root_view)
-//        val linear = root.findViewById<LinearLayout>(R.id.flutter_view_parent)
-
         initializeBubblesManager()
-
-//        onFlutterViewInit(layout = linear)
         onFlutterViewInit()
-
 
         messageChannel = BasicMessageChannel<String>(flutterEngine!!.dartExecutor, CHANNEL, StringCodec.INSTANCE)
         messageChannel!!.setMessageHandler { _, reply ->
@@ -76,15 +69,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun onFlutterViewInit() {
         // Initialize the flutterview
-//        val bubbleView = LayoutInflater.from(this@MainActivity).inflate(R.layout.bubble_view, null) as BubbleLayout
-//        val transparentFlutterView = bubbleView.findViewById<FlutterView>(R.id.flutter_view)
-        val transparentFlutterView = FlutterView(applicationContext, FlutterSurfaceView(applicationContext))
-//        val transparentFlutterView = FlutterView(applicationContext, FlutterTextureView(applicationContext))
-        transparentFlutterView.id = R.id.flutter_view
-
-//        // Add this view i.e. the newly created transparent flutterview to the R.layout.flutter_view
-//        bubbleView.addView(transparentFlutterView)
-
+        val transparentFlutterView = findViewById<FlutterView>(R.id.flutter_view)
+//        val transparentFlutterView = FlutterView(applicationContext, FlutterSurfaceView(applicationContext))
+        // val transparentFlutterView = FlutterView(applicationContext, FlutterTextureView(applicationContext))
+//        transparentFlutterView.id = R.id.flutter_view
         // Attach this newly created flutterview to the running instance of the engine
         transparentFlutterView.attachToFlutterEngine(flutterEngine!!)
         this.flutterView = transparentFlutterView
@@ -104,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             circle.borderColor = 0x000000
             circle.borderWidth = 32
             it.addView(circle)
-//            it.addView(this.flutterView)
+            // it.addView(this.flutterView)
         }
         bubbleView.setShouldStickToWall(true)
         bubblesManager!!.addBubble(bubbleView, 60, 20)
