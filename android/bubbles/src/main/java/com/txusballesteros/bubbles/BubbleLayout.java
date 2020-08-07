@@ -58,6 +58,8 @@ public class BubbleLayout extends BubbleBaseLayout {
     private int screenHeight;
     float prevX;
     float prevY;
+    float prevX;
+    float prevY;
     private float prevRawX;
     private float prevRawY;
     private WindowManager windowManager;
@@ -230,6 +232,27 @@ public class BubbleLayout extends BubbleBaseLayout {
                 }
             });
             animator.start();
+
+            // TODO stick to wall as well
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                // if done start the stick to wall animation
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    goToWall();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
         }
     }
 
@@ -294,6 +317,11 @@ public class BubbleLayout extends BubbleBaseLayout {
             nearestW = prevX;
             if (shouldStickToWall) {
                 nearestW = getViewParams().x >= middleX ? screenWidth : 0;
+            }
+            nearestFC = getViewParams().y >= middleY ? height - 20 : 20;
+            nearestW = prevX;
+            if (shouldStickToWall) {
+                nearestW = getViewParams().x >= middleX ? width : 0;
             }
             animator.start(nearestW, nearestFC);
         } else {
