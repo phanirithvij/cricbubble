@@ -1,6 +1,7 @@
 package com.example.cricbubble
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -94,8 +95,8 @@ class MainActivity : AppCompatActivity() {
             it.addView(circle)
             // it.addView(this.flutterView)
         }
-        bubbleView.setShouldStickToWall(true)
-        bubblesManager!!.addBubble(bubbleView, 60, 20)
+        bubbleView.shouldStickToWall = true
+        bubblesManager!!.addBubble(bubbleView, screenWidth(), 300)
     }
 
     private fun initializeBubblesManager() {
@@ -132,4 +133,13 @@ class MainActivity : AppCompatActivity() {
         var flutterEngine: FlutterEngine? = null
         const val CHANNEL = "increment"
     }
+
+    private fun screenWidth(): Int {
+        return Resources.getSystem().displayMetrics.widthPixels
+    }
+
+    private fun screenHeight(): Int {
+        return Resources.getSystem().displayMetrics.heightPixels
+    }
+
 }

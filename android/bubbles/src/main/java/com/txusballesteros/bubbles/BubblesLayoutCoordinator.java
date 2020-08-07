@@ -29,7 +29,7 @@ import android.view.WindowManager;
 
 final class BubblesLayoutCoordinator {
     private static BubblesLayoutCoordinator INSTANCE;
-    private BubbleTrashLayout trashView;
+    BubbleTrashLayout trashView;
     private BubblePreviewLayout preView;
     private WindowManager windowManager;
     private BubblesService bubblesService;

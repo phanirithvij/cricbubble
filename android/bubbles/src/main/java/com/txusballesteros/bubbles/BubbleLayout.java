@@ -24,10 +24,12 @@
  */
 package com.txusballesteros.bubbles;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -37,6 +39,10 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+
+import androidx.annotation.RequiresApi;
+
+import java.util.ArrayList;
 
 public class BubbleLayout extends BubbleBaseLayout {
     private float initialTouchX;
@@ -50,8 +56,8 @@ public class BubbleLayout extends BubbleBaseLayout {
     private MoveAnimator animator;
     private int width;
     private int height;
-    private float prevX;
-    private float prevY;
+    float prevX;
+    float prevY;
     private float prevRawX;
     private float prevRawY;
     private WindowManager windowManager;
@@ -86,6 +92,11 @@ public class BubbleLayout extends BubbleBaseLayout {
         initializeView();
     }
 
+
+    public boolean getShouldStickToWall() {
+        return this.shouldStickToWall;
+    }
+
     public void setShouldStickToWall(boolean shouldStick) {
         this.shouldStickToWall = shouldStick;
     }
@@ -109,7 +120,6 @@ public class BubbleLayout extends BubbleBaseLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event != null) {
-            Log.d("BubbleLayout", event.toString());
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     initialX = getViewParams().x;
@@ -124,15 +134,31 @@ public class BubbleLayout extends BubbleBaseLayout {
                 case MotionEvent.ACTION_MOVE:
                     int x = initialX + (int) (event.getRawX() - initialTouchX);
                     int y = initialY + (int) (event.getRawY() - initialTouchY);
-                    getViewParams().x = x;
-                    getViewParams().y = y;
+                    if (getLayoutCoordinator() != null) {
+                        // Fixes the flicker bug in trash layout
+                        // Update the coordinates only if magnetism not applied
+                        if (!getLayoutCoordinator().trashView.magnetismApplied) {
+                            getViewParams().x = x;
+                            getViewParams().y = y;
+                        } else {
+                            // If magnetism is applied prevent moving for small mouse move deltas
+                            float dx = (prevRawX - event.getRawX());
+                            float dy = (prevRawY - event.getRawY());
+                            if (dx * dx + dy * dy > 2) {
+                                getViewParams().x = x;
+                                getViewParams().y = y;
+                            }
+                        }
+                    }
                     getWindowManager().updateViewLayout(this, getViewParams());
                     if (getLayoutCoordinator() != null) {
+                        // Fixes the toggle bug
+                        // Makes sure the events have different touch position
                         float dx = (prevRawX - event.getRawX());
                         float dy = (prevRawY - event.getRawY());
                         if (dx * dx + dy * dy > 2) {
                             getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
-//                        TODO bug fix click to toggle not working
+                            // TODO preview enter and hide animations need to two add animation xml files
                             getLayoutCoordinator().hidePreview();
                         }
                     }
@@ -152,12 +178,13 @@ public class BubbleLayout extends BubbleBaseLayout {
                             }
                         }
                     }
+                    // TODO Action up indicates a click (?)
+                    performClick();
                     break;
             }
             prevRawX = event.getRawX();
             prevRawY = event.getRawY();
         }
-        performClick();
         return super.onTouchEvent(event);
     }
 
@@ -169,9 +196,39 @@ public class BubbleLayout extends BubbleBaseLayout {
 
     private void playAnimation() {
         if (!isInEditMode()) {
+            // Must call this here to initialize width and height
+            updateSize();
             AnimatorSet animator = (AnimatorSet) AnimatorInflater
                     .loadAnimator(getContext(), R.animator.bubble_shown_animator);
             animator.setTarget(this);
+            // TODO stick to wall as well
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    Log.d("BubbleLayout", String.valueOf(animation.isStarted()));
+                    Log.d("BubbleLayout", "Start");
+                }
+
+                // if done start the stick to wall animation
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    Log.d("BubbleLayout", String.valueOf(animation.getTotalDuration()));
+                    Log.d("BubbleLayout", "End");
+                    goToWall();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    Log.d("BubbleLayout", "Cancelled");
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                    Log.d("BubbleLayout", String.valueOf(animation.getDuration()));
+                    Log.d("BubbleLayout", "repeat");
+                }
+            });
             animator.start();
         }
     }
@@ -213,10 +270,13 @@ public class BubbleLayout extends BubbleBaseLayout {
     }
 
     public void goToWall() {
+        Log.d("BubblesLayout", "Should stick to wall??");
+        Log.d("BubblesLayout", String.valueOf(width) + getViewParams().x);
         if (shouldStickToWall) {
             int middle = width / 2;
             float nearestXWall = getViewParams().x >= middle ? width : 0;
             animator.start(nearestXWall, getViewParams().y);
+            Log.d("BubblesLayout", String.valueOf(nearestXWall));
         }
     }
 
@@ -230,8 +290,11 @@ public class BubbleLayout extends BubbleBaseLayout {
         if (visibility == View.VISIBLE) {
             prevX = getViewParams().x;
             prevY = getViewParams().y;
-            nearestFC = getViewParams().y >= middleY ? height-20 : 20;
-            nearestW = getViewParams().x >= middleX ? width : 0;
+            nearestFC = getViewParams().y >= middleY ? height - 20 : 20;
+            nearestW = prevX;
+            if (shouldStickToWall) {
+                nearestW = getViewParams().x >= middleX ? width : 0;
+            }
             animator.start(nearestW, nearestFC);
         } else {
             animator.start(prevX, prevY);
@@ -245,17 +308,33 @@ public class BubbleLayout extends BubbleBaseLayout {
     }
 
 
-    private class MoveAnimator implements Runnable {
+    class MoveAnimator implements Runnable {
         private Handler handler = new Handler(Looper.getMainLooper());
         private float destinationX;
         private float destinationY;
         private long startingTime;
+        private ArrayList<MoveAnimatorListener> mlisteners;
 
         private void start(float x, float y) {
+            safeInit();
             this.destinationX = x;
             this.destinationY = y;
             startingTime = System.currentTimeMillis();
+            for (int i = 0; i < mlisteners.size(); i++) {
+                mlisteners.get(i).onAnimationStart(this);
+            }
             handler.post(this);
+        }
+
+        private void safeInit() {
+            if (mlisteners == null) {
+                mlisteners = new ArrayList<>();
+            }
+        }
+
+        void addListener(MoveAnimatorListener listener) {
+            safeInit();
+            mlisteners.add(listener);
         }
 
         @Override
@@ -267,12 +346,34 @@ public class BubbleLayout extends BubbleBaseLayout {
                 move(deltaX, deltaY);
                 if (progress < 1) {
                     handler.post(this);
+                } else {
+                    for (int i = 0; i < mlisteners.size(); i++) {
+                        mlisteners.get(i).onAnimationEnd(this);
+                    }
                 }
             }
         }
 
         private void stop() {
             handler.removeCallbacks(this);
+            removeAllListeners();
+        }
+
+        void removeAllListeners() {
+            this.mlisteners.clear();
+        }
+
+        void removeListener(MoveAnimatorListener listener) {
+            if (this.mlisteners.isEmpty()) return;
+
+            this.mlisteners.remove(listener);
         }
     }
+}
+
+
+interface MoveAnimatorListener {
+    void onAnimationEnd(BubbleLayout.MoveAnimator animation);
+
+    void onAnimationStart(BubbleLayout.MoveAnimator animation);
 }

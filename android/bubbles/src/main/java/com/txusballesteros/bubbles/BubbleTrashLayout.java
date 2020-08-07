@@ -32,7 +32,7 @@ import android.util.AttributeSet;
 
 class BubbleTrashLayout extends BubbleBaseLayout {
     public static final int VIBRATION_DURATION_IN_MS = 70;
-    private boolean magnetismApplied = false;
+    boolean magnetismApplied = false;
     private boolean attachedToWindow = false;
     private boolean isVibrateInThisSession = false;
 
@@ -66,8 +66,6 @@ class BubbleTrashLayout extends BubbleBaseLayout {
             if (visibility != getVisibility()) {
                 if (visibility == VISIBLE) {
                     playAnimation(R.animator.bubble_trash_shown_animator);
-
-
                 } else {
                     playAnimation(R.animator.bubble_trash_hide_animator);
                 }
@@ -76,7 +74,13 @@ class BubbleTrashLayout extends BubbleBaseLayout {
         super.setVisibility(visibility);
     }
 
+    // TODO idea: Unrelated to this project
+    //  instead of referencing commits and issues assign ids to a function or scope
+    //  And ctrl + click to move to that line like linked bookmarks (?)
+
     void applyMagnetism() {
+        // Fixed: flicker on trash
+        // Fixed In Action_MOVE of BubbleBaseLayout
         if (!magnetismApplied) {
             magnetismApplied = true;
             playAnimation(R.animator.bubble_trash_shown_magnetism_animator);
@@ -84,8 +88,8 @@ class BubbleTrashLayout extends BubbleBaseLayout {
     }
 
     void vibrate() {
-        if (!isVibrateInThisSession){
-            final Vibrator vibrator = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        if (!isVibrateInThisSession) {
+            final Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(VIBRATION_DURATION_IN_MS);
             isVibrateInThisSession = true;
         }
