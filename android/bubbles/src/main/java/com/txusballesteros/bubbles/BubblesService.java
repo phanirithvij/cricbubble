@@ -92,6 +92,9 @@ public class BubblesService extends Service {
         bubble.setLayoutCoordinator(layoutCoordinator);
         bubbles.add(bubble);
         addViewToWindow(bubble);
+        // Initialize prev values to restore on initial toggle
+        bubble.prevX = x;
+        bubble.prevY = y;
     }
 
     void addTrash(int trashLayoutResourceId) {

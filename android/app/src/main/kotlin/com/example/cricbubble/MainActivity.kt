@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             // it.addView(this.flutterView)
         }
         bubbleView.setShouldStickToWall(true)
-        bubblesManager!!.addBubble(bubbleView, 60, 20)
+        bubblesManager!!.addBubble(bubbleView, 100, 300)
     }
 
     private fun initializeBubblesManager() {
