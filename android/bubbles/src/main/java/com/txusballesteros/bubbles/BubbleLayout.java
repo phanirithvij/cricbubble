@@ -22,358 +22,333 @@
  *
  * Contact: Txus Ballesteros <txus.ballesteros@gmail.com>
  */
-package com.txusballesteros.bubbles;
+package com.txusballesteros.bubbles
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
-import android.content.Context;
-import android.graphics.Point;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
+import android.content.Context
+import android.content.res.Resources
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
+import android.view.View
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
+import com.txusballesteros.bubbles.BubbleLayout.MoveAnimator
+import java.util.*
+import kotlin.math.min
 
-import androidx.annotation.RequiresApi;
+class BubbleLayout : BubbleBaseLayout {
+    private var initialTouchX = 0f
+    private var initialTouchY = 0f
+    private var initialX = 0
+    private var initialY = 0
+    private var onBubbleRemoveListener: OnBubbleRemoveListener? = null
+    private var onBubbleClickListener: OnBubbleClickListener? = null
+    private var lastTouchDown: Long = 0
+    private var animator: MoveAnimator
+    private var screenWidth = 0
+    private var screenHeight = 0
 
-import java.util.ArrayList;
+    @JvmField
+    var prevX = 0f
 
-public class BubbleLayout extends BubbleBaseLayout {
-    private float initialTouchX;
-    private float initialTouchY;
-    private int initialX;
-    private int initialY;
-    private OnBubbleRemoveListener onBubbleRemoveListener;
-    private OnBubbleClickListener onBubbleClickListener;
-    private static final int TOUCH_TIME_THRESHOLD = 150;
-    private long lastTouchDown;
-    private MoveAnimator animator;
-    private int width;
-    private int height;
-    float prevX;
-    float prevY;
-    private float prevRawX;
-    private float prevRawY;
-    private WindowManager windowManager;
-    private boolean shouldStickToWall = true;
-
-    public void setOnBubbleRemoveListener(OnBubbleRemoveListener listener) {
-        onBubbleRemoveListener = listener;
+    @JvmField
+    var prevY = 0f
+    private var prevRawX = 0f
+    private var prevRawY = 0f
+    override var windowManager: WindowManager?
+    var shouldStickToWall = true
+    fun setOnBubbleRemoveListener(listener: OnBubbleRemoveListener?) {
+        onBubbleRemoveListener = listener
     }
 
-    public void setOnBubbleClickListener(OnBubbleClickListener listener) {
-        onBubbleClickListener = listener;
+    fun setOnBubbleClickListener(listener: OnBubbleClickListener?) {
+        onBubbleClickListener = listener
     }
 
-    public BubbleLayout(Context context) {
-        super(context);
-        animator = new MoveAnimator();
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        initializeView();
+    constructor(context: Context) : super(context) {
+        animator = MoveAnimator()
+        windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        initializeView()
     }
 
-    public BubbleLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        animator = new MoveAnimator();
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        initializeView();
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        animator = MoveAnimator()
+        windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        initializeView()
     }
 
-    public BubbleLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        animator = new MoveAnimator();
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        initializeView();
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        animator = MoveAnimator()
+        windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        initializeView()
     }
 
-
-    public boolean getShouldStickToWall() {
-        return this.shouldStickToWall;
-    }
-
-    public void setShouldStickToWall(boolean shouldStick) {
-        this.shouldStickToWall = shouldStick;
-    }
-
-    void notifyBubbleRemoved() {
+    fun notifyBubbleRemoved() {
         if (onBubbleRemoveListener != null) {
-            onBubbleRemoveListener.onBubbleRemoved(this);
+            onBubbleRemoveListener!!.onBubbleRemoved(this)
         }
     }
 
-    private void initializeView() {
-        setClickable(true);
+    private fun initializeView() {
+        isClickable = true
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        playAnimation();
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        playAnimation()
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event != null) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    initialX = getViewParams().x;
-                    initialY = getViewParams().y;
-                    initialTouchX = event.getRawX();
-                    initialTouchY = event.getRawY();
-                    playAnimationClickDown();
-                    lastTouchDown = System.currentTimeMillis();
-                    updateSize();
-                    animator.stop();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    int x = initialX + (int) (event.getRawX() - initialTouchX);
-                    int y = initialY + (int) (event.getRawY() - initialTouchY);
-                    if (getLayoutCoordinator() != null) {
-                        // Fixes the flicker bug in trash layout
-                        // Update the coordinates only if magnetism not applied
-                        if (!getLayoutCoordinator().trashView.magnetismApplied) {
-                            getViewParams().x = x;
-                            getViewParams().y = y;
-                        } else {
-                            // If magnetism is applied prevent moving for small mouse move deltas
-                            float dx = (prevRawX - event.getRawX());
-                            float dy = (prevRawY - event.getRawY());
-                            if (dx * dx + dy * dy > 2) {
-                                getViewParams().x = x;
-                                getViewParams().y = y;
-                            }
-                        }
-                    }
-                    getWindowManager().updateViewLayout(this, getViewParams());
-                    if (getLayoutCoordinator() != null) {
-                        // Fixes the toggle bug
-                        // Makes sure the events have different touch position
-                        float dx = (prevRawX - event.getRawX());
-                        float dy = (prevRawY - event.getRawY());
-                        if (dx * dx + dy * dy > 2) {
-                            getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
-                            // TODO preview enter and hide animations need to two add animation xml files
-                            getLayoutCoordinator().hidePreview();
-                        }
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    goToWall();
-                    if (getLayoutCoordinator() != null) {
-                        getLayoutCoordinator().notifyBubbleRelease(this);
-                        playAnimationClickUp();
-                    }
-                    if (System.currentTimeMillis() - lastTouchDown < TOUCH_TIME_THRESHOLD) {
-                        if (onBubbleClickListener != null) {
-                            onBubbleClickListener.onBubbleClick(this);
-                            if (getLayoutCoordinator() != null) {
-                                getLayoutCoordinator().notifyPreviewVisibilityListener();
-                                moveUponPreview();
-                            }
-                        }
-                    }
-                    // TODO Action up indicates a click (?)
-                    performClick();
-                    break;
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                initialX = viewParams!!.x
+                initialY = viewParams!!.y
+                initialTouchX = event.rawX
+                initialTouchY = event.rawY
+                playAnimationClickDown()
+                lastTouchDown = System.currentTimeMillis()
+                updateSize()
+                animator.stop()
             }
-            prevRawX = event.getRawX();
-            prevRawY = event.getRawY();
+            MotionEvent.ACTION_MOVE -> {
+                val x = initialX + (event.rawX - initialTouchX).toInt()
+                val y = initialY + (event.rawY - initialTouchY).toInt()
+                if (layoutCoordinator != null) {
+                    // Fixes the flicker bug in trash layout
+                    // Update the coordinates only if magnetism not applied
+                    if (!layoutCoordinator!!.trashView!!.magnetismApplied) {
+                        viewParams!!.x = x
+                        viewParams!!.y = y
+                    } else {
+                        // If magnetism is applied prevent moving for small mouse move deltas
+                        val dx = prevRawX - event.rawX
+                        val dy = prevRawY - event.rawY
+                        if (dx * dx + dy * dy > 2) {
+                            viewParams!!.x = x
+                            viewParams!!.y = y
+                        }
+                    }
+                }
+                windowManager!!.updateViewLayout(this, viewParams)
+                if (layoutCoordinator != null) {
+                    // Fixes the toggle bug
+                    // Makes sure the events have different touch position
+                    val dx = prevRawX - event.rawX
+                    val dy = prevRawY - event.rawY
+                    if (dx * dx + dy * dy > 2) {
+                        layoutCoordinator!!.notifyBubblePositionChanged(this, x, y)
+                        // TODO preview enter and hide animations need to two add animation xml files
+                        layoutCoordinator!!.hidePreview()
+                    }
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                goToWall()
+                if (layoutCoordinator != null) {
+                    layoutCoordinator!!.notifyBubbleRelease(this)
+                    playAnimationClickUp()
+                }
+                if (System.currentTimeMillis() - lastTouchDown < TOUCH_TIME_THRESHOLD) {
+                    if (onBubbleClickListener != null) {
+                        onBubbleClickListener!!.onBubbleClick(this)
+                        if (layoutCoordinator != null) {
+                            layoutCoordinator!!.notifyPreviewVisibilityListener()
+                            moveUponPreview()
+                        }
+                    }
+                }
+                // TODO Action up indicates a click (?)
+                performClick()
+            }
         }
-        return super.onTouchEvent(event);
+        prevRawX = event.rawX
+        prevRawY = event.rawY
+        return super.onTouchEvent(event)
     }
 
-    @Override
-    public boolean performClick() {
-        Log.d("BubblesLayout", "Perform Click");
-        return super.performClick();
+    override fun performClick(): Boolean {
+        Log.d("BubblesLayout", "Perform Click")
+        return super.performClick()
     }
 
-    private void playAnimation() {
-        if (!isInEditMode()) {
+    private fun playAnimation() {
+        if (!isInEditMode) {
             // Must call this here to initialize width and height
-            updateSize();
-            AnimatorSet animator = (AnimatorSet) AnimatorInflater
-                    .loadAnimator(getContext(), R.animator.bubble_shown_animator);
-            animator.setTarget(this);
+            updateSize()
+            val animator = AnimatorInflater
+                    .loadAnimator(context, R.animator.bubble_shown_animator) as AnimatorSet
+            animator.setTarget(this)
             // TODO stick to wall as well
-            animator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    Log.d("BubbleLayout", String.valueOf(animation.isStarted()));
-                    Log.d("BubbleLayout", "Start");
+            animator.addListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    Log.d("BubbleLayout", animation.isStarted.toString())
+                    Log.d("BubbleLayout", "Start")
                 }
 
                 // if done start the stick to wall animation
                 @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    Log.d("BubbleLayout", String.valueOf(animation.getTotalDuration()));
-                    Log.d("BubbleLayout", "End");
-                    goToWall();
+                override fun onAnimationEnd(animation: Animator) {
+                    Log.d("BubbleLayout", animation.totalDuration.toString())
+                    Log.d("BubbleLayout", "End")
+                    goToWall()
                 }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    Log.d("BubbleLayout", "Cancelled");
+                override fun onAnimationCancel(animation: Animator) {
+                    Log.d("BubbleLayout", "Cancelled")
                 }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                    Log.d("BubbleLayout", String.valueOf(animation.getDuration()));
-                    Log.d("BubbleLayout", "repeat");
+                override fun onAnimationRepeat(animation: Animator) {
+                    Log.d("BubbleLayout", animation.duration.toString())
+                    Log.d("BubbleLayout", "repeat")
                 }
-            });
-            animator.start();
+            })
+            animator.start()
         }
     }
 
-    private void playAnimationClickDown() {
-        if (!isInEditMode()) {
-            AnimatorSet animator = (AnimatorSet) AnimatorInflater
-                    .loadAnimator(getContext(), R.animator.bubble_down_click_animator);
-            animator.setTarget(this);
-            animator.start();
+    private fun playAnimationClickDown() {
+        if (!isInEditMode) {
+            val animator = AnimatorInflater
+                    .loadAnimator(context, R.animator.bubble_down_click_animator) as AnimatorSet
+            animator.setTarget(this)
+            animator.start()
         }
     }
 
-    private void playAnimationClickUp() {
-        if (!isInEditMode()) {
-            AnimatorSet animator = (AnimatorSet) AnimatorInflater
-                    .loadAnimator(getContext(), R.animator.bubble_up_click_animator);
-            animator.setTarget(this);
-            animator.start();
+    private fun playAnimationClickUp() {
+        if (!isInEditMode) {
+            val animator = AnimatorInflater
+                    .loadAnimator(context, R.animator.bubble_up_click_animator) as AnimatorSet
+            animator.setTarget(this)
+            animator.start()
         }
     }
 
-    private void updateSize() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(metrics);
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        width = (size.x - this.getWidth());
-        height = (size.y - this.getHeight());
+    private fun updateSize() {
+        val sw = Resources.getSystem().displayMetrics.widthPixels
+        val sh = Resources.getSystem().displayMetrics.widthPixels
+        screenWidth = sw - this.width
+        screenHeight = sh - this.height
     }
 
-    public interface OnBubbleRemoveListener {
-        void onBubbleRemoved(BubbleLayout bubble);
+    interface OnBubbleRemoveListener {
+        fun onBubbleRemoved(bubble: BubbleLayout?)
     }
 
-    public interface OnBubbleClickListener {
-        void onBubbleClick(BubbleLayout bubble);
+    interface OnBubbleClickListener {
+        fun onBubbleClick(bubble: BubbleLayout?)
     }
 
-    public void goToWall() {
-        Log.d("BubblesLayout", "Should stick to wall??");
-        Log.d("BubblesLayout", String.valueOf(width) + getViewParams().x);
+    fun goToWall() {
+        Log.d("BubblesLayout", "Should stick to wall??")
+        Log.d("BubblesLayout", screenWidth.toString() + viewParams!!.x)
         if (shouldStickToWall) {
-            int middle = width / 2;
-            float nearestXWall = getViewParams().x >= middle ? width : 0;
-            animator.start(nearestXWall, getViewParams().y);
-            Log.d("BubblesLayout", String.valueOf(nearestXWall));
+            val middle = screenWidth / 2
+            val nearestXWall = if (viewParams!!.x >= middle) screenWidth.toFloat() else 0.toFloat()
+            animator.start(nearestXWall, viewParams!!.y.toFloat())
+            Log.d("BubblesLayout", nearestXWall.toString())
         }
     }
 
-    public void moveUponPreview() {
-        int middleY = height / 2;
-        int middleX = width / 2;
-        int visibility = getLayoutCoordinator().getPreViewVisibility();
-        float nearestW;
-        float nearestFC;
+    fun moveUponPreview() {
+        val middleY = screenHeight / 2
+        val middleX = screenWidth / 2
+        val visibility = layoutCoordinator!!.preViewVisibility
+        var nearestW: Float
+        val nearestFC: Float
         // View.VISIBLE because we are calling this function after calling toggleVisibility
         if (visibility == View.VISIBLE) {
-            prevX = getViewParams().x;
-            prevY = getViewParams().y;
-            nearestFC = getViewParams().y >= middleY ? height - 20 : 20;
-            nearestW = prevX;
+            prevX = viewParams!!.x.toFloat()
+            prevY = viewParams!!.y.toFloat()
+            nearestFC = if (viewParams!!.y >= middleY) (screenHeight - 20).toFloat() else 20.toFloat()
+            nearestW = prevX
             if (shouldStickToWall) {
-                nearestW = getViewParams().x >= middleX ? width : 0;
+                nearestW = if (viewParams!!.x >= middleX) screenWidth.toFloat() else 0.toFloat()
             }
-            animator.start(nearestW, nearestFC);
+            animator.start(nearestW, nearestFC)
         } else {
-            animator.start(prevX, prevY);
+            animator.start(prevX, prevY)
         }
     }
 
-    private void move(float deltaX, float deltaY) {
-        getViewParams().x += deltaX;
-        getViewParams().y += deltaY;
-        windowManager.updateViewLayout(this, getViewParams());
+    private fun move(deltaX: Float, deltaY: Float) {
+        viewParams!!.x += deltaX.toInt()
+        viewParams!!.y += deltaY.toInt()
+        windowManager!!.updateViewLayout(this, viewParams)
     }
 
-
-    class MoveAnimator implements Runnable {
-        private Handler handler = new Handler(Looper.getMainLooper());
-        private float destinationX;
-        private float destinationY;
-        private long startingTime;
-        private ArrayList<MoveAnimatorListener> mlisteners;
-
-        private void start(float x, float y) {
-            safeInit();
-            this.destinationX = x;
-            this.destinationY = y;
-            startingTime = System.currentTimeMillis();
-            for (int i = 0; i < mlisteners.size(); i++) {
-                mlisteners.get(i).onAnimationStart(this);
+    internal inner class MoveAnimator : Runnable {
+        private val handler = Handler(Looper.getMainLooper())
+        private var destinationX = 0f
+        private var destinationY = 0f
+        private var startingTime: Long = 0
+        private var mlisteners: ArrayList<MoveAnimatorListener>? = null
+        fun start(x: Float, y: Float) {
+            safeInit()
+            destinationX = x
+            destinationY = y
+            startingTime = System.currentTimeMillis()
+            for (i in mlisteners!!.indices) {
+                mlisteners!![i].onAnimationStart(this)
             }
-            handler.post(this);
+            handler.post(this)
         }
 
-        private void safeInit() {
+        private fun safeInit() {
             if (mlisteners == null) {
-                mlisteners = new ArrayList<>();
+                mlisteners = ArrayList()
             }
         }
 
-        void addListener(MoveAnimatorListener listener) {
-            safeInit();
-            mlisteners.add(listener);
+        fun addListener(listener: MoveAnimatorListener) {
+            safeInit()
+            mlisteners!!.add(listener)
         }
 
-        @Override
-        public void run() {
-            if (getRootView() != null && getRootView().getParent() != null) {
-                float progress = Math.min(1, (System.currentTimeMillis() - startingTime) / 400f);
-                float deltaX = (destinationX - getViewParams().x) * progress;
-                float deltaY = (destinationY - getViewParams().y) * progress;
-                move(deltaX, deltaY);
+        override fun run() {
+            if (rootView != null && rootView.parent != null) {
+                val progress = min(1f, (System.currentTimeMillis() - startingTime) / 400f)
+                val deltaX = (destinationX - viewParams!!.x) * progress
+                val deltaY = (destinationY - viewParams!!.y) * progress
+                move(deltaX, deltaY)
                 if (progress < 1) {
-                    handler.post(this);
+                    handler.post(this)
                 } else {
-                    for (int i = 0; i < mlisteners.size(); i++) {
-                        mlisteners.get(i).onAnimationEnd(this);
+                    for (i in mlisteners!!.indices) {
+                        mlisteners!![i].onAnimationEnd(this)
                     }
                 }
             }
         }
 
-        private void stop() {
-            handler.removeCallbacks(this);
-            removeAllListeners();
+        fun stop() {
+            handler.removeCallbacks(this)
+            removeAllListeners()
         }
 
-        void removeAllListeners() {
-            this.mlisteners.clear();
+        private fun removeAllListeners() {
+            mlisteners!!.clear()
         }
 
-        void removeListener(MoveAnimatorListener listener) {
-            if (this.mlisteners.isEmpty()) return;
-
-            this.mlisteners.remove(listener);
+        fun removeListener(listener: MoveAnimatorListener?) {
+            if (mlisteners!!.isEmpty()) return
+            mlisteners!!.remove(listener)
         }
+    }
+
+    companion object {
+        private const val TOUCH_TIME_THRESHOLD = 150
     }
 }
 
-
-interface MoveAnimatorListener {
-    void onAnimationEnd(BubbleLayout.MoveAnimator animation);
-
-    void onAnimationStart(BubbleLayout.MoveAnimator animation);
+internal interface MoveAnimatorListener {
+    fun onAnimationEnd(animation: MoveAnimator?)
+    fun onAnimationStart(animation: MoveAnimator?)
 }
