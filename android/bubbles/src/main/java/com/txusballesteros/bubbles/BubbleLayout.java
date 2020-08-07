@@ -53,8 +53,13 @@ public class BubbleLayout extends BubbleBaseLayout {
     private MoveAnimator animator;
     private int width;
     private int height;
+<<<<<<< HEAD
     float prevX;
     float prevY;
+=======
+    private float prevX;
+    private float prevY;
+>>>>>>> d9c3756cf9990639d55e4de8ff81c2cb2d26bd61
     private float prevRawX;
     private float prevRawY;
     private WindowManager windowManager;
@@ -112,7 +117,11 @@ public class BubbleLayout extends BubbleBaseLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event != null) {
+<<<<<<< HEAD
 //            Log.d("BubbleLayout", event.toString());
+=======
+            Log.d("BubbleLayout", event.toString());
+>>>>>>> d9c3756cf9990639d55e4de8ff81c2cb2d26bd61
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     initialX = getViewParams().x;
@@ -145,13 +154,20 @@ public class BubbleLayout extends BubbleBaseLayout {
                     }
                     getWindowManager().updateViewLayout(this, getViewParams());
                     if (getLayoutCoordinator() != null) {
+<<<<<<< HEAD
                         // Fixes the toggle bug
                         // Makes sure the events have different touch position
+=======
+>>>>>>> d9c3756cf9990639d55e4de8ff81c2cb2d26bd61
                         float dx = (prevRawX - event.getRawX());
                         float dy = (prevRawY - event.getRawY());
                         if (dx * dx + dy * dy > 2) {
                             getLayoutCoordinator().notifyBubblePositionChanged(this, x, y);
+<<<<<<< HEAD
                             // TODO preview enter and hide animations need to two add animation xml files
+=======
+//                        TODO bug fix click to toggle not working
+>>>>>>> d9c3756cf9990639d55e4de8ff81c2cb2d26bd61
                             getLayoutCoordinator().hidePreview();
                         }
                     }
@@ -178,6 +194,7 @@ public class BubbleLayout extends BubbleBaseLayout {
             prevRawX = event.getRawX();
             prevRawY = event.getRawY();
         }
+        performClick();
         return super.onTouchEvent(event);
     }
 
@@ -271,11 +288,16 @@ public class BubbleLayout extends BubbleBaseLayout {
         if (visibility == View.VISIBLE) {
             prevX = getViewParams().x;
             prevY = getViewParams().y;
+<<<<<<< HEAD
             nearestFC = getViewParams().y >= middleY ? height - 20 : 20;
             nearestW = prevX;
             if (shouldStickToWall) {
                 nearestW = getViewParams().x >= middleX ? width : 0;
             }
+=======
+            nearestFC = getViewParams().y >= middleY ? height-20 : 20;
+            nearestW = getViewParams().x >= middleX ? width : 0;
+>>>>>>> d9c3756cf9990639d55e4de8ff81c2cb2d26bd61
             animator.start(nearestW, nearestFC);
         } else {
             animator.start(prevX, prevY);

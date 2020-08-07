@@ -136,10 +136,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: (index == 0)
                                   ? IconButton(
                                       icon: Icon(
-                                      Icons.add,
-                                      size: 30,
-                                      color: Color.fromRGBO(195, 195, 195, 1),
-                                    ))
+                                        Icons.add,
+                                        size: 30,
+                                        color: Color.fromRGBO(195, 195, 195, 1),
+                                      ),
+                                      onPressed: () {},
+                                    )
                                   : Image.asset(
                                       "assets/profile_pics/$profilePic"),
                             ),
