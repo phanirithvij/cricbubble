@@ -58,8 +58,6 @@ public class BubbleLayout extends BubbleBaseLayout {
     private int screenHeight;
     float prevX;
     float prevY;
-    float prevX;
-    float prevY;
     private float prevRawX;
     private float prevRawY;
     private WindowManager windowManager;
@@ -318,10 +316,10 @@ public class BubbleLayout extends BubbleBaseLayout {
             if (shouldStickToWall) {
                 nearestW = getViewParams().x >= middleX ? screenWidth : 0;
             }
-            nearestFC = getViewParams().y >= middleY ? height - 20 : 20;
+            nearestFC = getViewParams().y >= middleY ? screenHeight - 20 : 20;
             nearestW = prevX;
             if (shouldStickToWall) {
-                nearestW = getViewParams().x >= middleX ? width : 0;
+                nearestW = getViewParams().x >= middleX ? screenWidth : 0;
             }
             animator.start(nearestW, nearestFC);
         } else {
