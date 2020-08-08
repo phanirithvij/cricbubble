@@ -27,20 +27,16 @@ package com.txusballesteros.bubbles
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 
-class BubbleTrashLayout : BubbleBaseLayout {
-    var magnetismApplied = false
+internal class BubblePreviewLayout : BubbleBaseLayout {
     private var attachedToWindow = false
-    private var isVibrateInThisSession = false
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?) : super(context) {}
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -52,51 +48,32 @@ class BubbleTrashLayout : BubbleBaseLayout {
         attachedToWindow = false
     }
 
+    fun toggleVisibility() {
+        // So GONE vs INVISIBLE the difference https://stackoverflow.com/a/23211042/8608146
+        // GONE will mean it's not there in the layout tree but invisible means it's just hidden
+        // So GONE for our use case as we don't want the preview to interrupt touches while hidden
+        if (visibility == View.VISIBLE) {
+            visibility = View.GONE
+        } else if (visibility == View.GONE) {
+            visibility = View.VISIBLE
+        }
+    }
+
     override fun setVisibility(visibility: Int) {
         if (attachedToWindow) {
             if (visibility != getVisibility()) {
                 if (visibility == View.VISIBLE) {
-                    playAnimation(R.animator.bubble_trash_shown_animator)
+                    Log.d("Ok", "Visible")
+                    // todo show some animation for preview opening
+                    // playAnimation(R.animator.bubble_trash_shown_animator);
                 } else {
-                    playAnimation(R.animator.bubble_trash_hide_animator)
+                    // todo show some animation for preview closing
+                    // playAnimation(R.animator.bubble_trash_hide_animator);
+                    Log.d("Ok", "Not visible")
                 }
             }
         }
         super.setVisibility(visibility)
-    }
-
-    // TODO idea: Unrelated to this project
-    //  instead of referencing commits and issues assign ids to a function or scope
-    //  And ctrl + click to move to that line like linked bookmarks (?)
-    fun applyMagnetism() {
-        // Fixed: flicker on trash
-        // Fixed In Action_MOVE of BubbleBaseLayout
-        if (!magnetismApplied) {
-            magnetismApplied = true
-            playAnimation(R.animator.bubble_trash_shown_magnetism_animator)
-        }
-    }
-
-    fun vibrate() {
-        if (!isVibrateInThisSession) {
-            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_DURATION_IN_MS.toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                //deprecated in API 26
-                @Suppress("DEPRECATION")
-                vibrator.vibrate(VIBRATION_DURATION_IN_MS.toLong())
-            }
-            isVibrateInThisSession = true
-        }
-    }
-
-    fun releaseMagnetism() {
-        if (magnetismApplied) {
-            magnetismApplied = false
-            playAnimation(R.animator.bubble_trash_hide_magnetism_animator)
-        }
-        isVibrateInThisSession = false
     }
 
     private fun playAnimation(animationResourceId: Int) {
@@ -106,9 +83,5 @@ class BubbleTrashLayout : BubbleBaseLayout {
             animator.setTarget(getChildAt(0))
             animator.start()
         }
-    }
-
-    companion object {
-        const val VIBRATION_DURATION_IN_MS = 70
     }
 }

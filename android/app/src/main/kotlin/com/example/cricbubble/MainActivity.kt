@@ -84,27 +84,32 @@ class MainActivity : AppCompatActivity() {
         // push to array
         // set random color and text based on the index
         val bubbleView = LayoutInflater.from(this@MainActivity).inflate(R.layout.bubble_view, null) as BubbleLayout
-        bubbleView.setOnBubbleRemoveListener {
-            Toast.makeText(applicationContext, "Closed !",
-                    Toast.LENGTH_SHORT).show()
-            // remove from array
-        }
-        bubbleView.setOnBubbleClickListener {
-            val circle = CircleImageView(applicationContext)
-            circle.borderColor = 0x000000
-            circle.borderWidth = 32
-            it.addView(circle)
-            // it.addView(this.flutterView)
-        }
+        bubbleView.setOnBubbleRemoveListener(object : BubbleLayout.OnBubbleRemoveListener {
+            override fun onBubbleRemoved(bubble: BubbleLayout) {
+                Toast.makeText(applicationContext, "Closed !",
+                        Toast.LENGTH_SHORT).show()
+                // remove from array
+            }
+        })
+        bubbleView.setOnBubbleClickListener(object : BubbleLayout.OnBubbleClickListener {
+            override fun onBubbleClick(bubble: BubbleLayout) {
+                val circle = CircleImageView(applicationContext)
+                circle.borderColor = 0x000000
+                circle.borderWidth = 32
+                bubble.addView(circle)
+                // it.addView(this.flutterView)
+            }
+        })
         bubbleView.shouldStickToWall = true
         bubblesManager!!.addBubble(bubbleView, screenWidth(), 300)
     }
 
     private fun initializeBubblesManager() {
         bubblesManager = BubblesManager.Builder(this)
+                // TODO must call both functions for now for the app to not crash
                 .setTrashLayout(R.layout.bubble_trash_layout)
                 .setPreviewLayout(R.layout.preview_layout)
-                .setInitializationCallback(object: OnInitializedCallback{
+                .setInitializationCallback(object : OnInitializedCallback {
                     override fun onInitialized() {
                         addNewBubble()
                     }
