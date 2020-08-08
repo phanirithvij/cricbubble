@@ -22,8 +22,8 @@
  *
  * Contact: Txus Ballesteros <txus.ballesteros@gmail.com>
  */
-package com.txusballesteros.bubbles;
+package com.txusballesteros.bubbles
 
-public interface OnInitializedCallback {
-    void onInitialized();
+interface OnInitializedCallback {
+    fun onInitialized()
 }

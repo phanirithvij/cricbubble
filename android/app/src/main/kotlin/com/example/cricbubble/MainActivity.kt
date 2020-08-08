@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.txusballesteros.bubbles.BubbleLayout
 import com.txusballesteros.bubbles.BubblesManager
+import com.txusballesteros.bubbles.OnInitializedCallback
 import de.hdodenhof.circleimageview.CircleImageView
 import io.flutter.embedding.android.FlutterView
 import io.flutter.embedding.engine.FlutterEngine
@@ -103,7 +104,11 @@ class MainActivity : AppCompatActivity() {
         bubblesManager = BubblesManager.Builder(this)
                 .setTrashLayout(R.layout.bubble_trash_layout)
                 .setPreviewLayout(R.layout.preview_layout)
-                .setInitializationCallback { addNewBubble() }
+                .setInitializationCallback(object: OnInitializedCallback{
+                    override fun onInitialized() {
+                        addNewBubble()
+                    }
+                })
                 .build()
         bubblesManager!!.initialize()
     }
