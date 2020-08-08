@@ -27,6 +27,8 @@ package com.txusballesteros.bubbles
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.AttributeSet
 import android.view.View
@@ -79,7 +81,13 @@ internal class BubbleTrashLayout : BubbleBaseLayout {
     fun vibrate() {
         if (!isVibrateInThisSession) {
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            vibrator.vibrate(VIBRATION_DURATION_IN_MS.toLong())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_DURATION_IN_MS.toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                //deprecated in API 26
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(VIBRATION_DURATION_IN_MS.toLong())
+            }
             isVibrateInThisSession = true
         }
     }
