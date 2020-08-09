@@ -26,7 +26,9 @@ package com.txusballesteros.bubbles
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -56,9 +58,9 @@ class BubbleTrashLayout : BubbleBaseLayout {
         if (attachedToWindow) {
             if (visibility != getVisibility()) {
                 if (visibility == View.VISIBLE) {
-                    playAnimation(R.animator.bubble_trash_shown_animator)
+                    playAnimation(TrashAnimationType.Open)
                 } else {
-                    playAnimation(R.animator.bubble_trash_hide_animator)
+                    playAnimation(TrashAnimationType.Close)
                 }
             }
         }
@@ -106,6 +108,37 @@ class BubbleTrashLayout : BubbleBaseLayout {
             animator.setTarget(getChildAt(0))
             animator.start()
         }
+    }
+
+    private fun playAnimation(typeTrash: TrashAnimationType) {
+        when (typeTrash) {
+            TrashAnimationType.Open -> {
+                val offsetY = screenHeight() - this.getChildAt(0).measuredHeight - 20f
+                ObjectAnimator.ofFloat(getChildAt(0), "y", offsetY).run {
+                    duration = 400
+                    start()
+                }
+            }
+            TrashAnimationType.Close -> {
+                ObjectAnimator.ofFloat(getChildAt(0), "y", screenHeight()).run {
+                    duration = 100
+                    start()
+                }
+            }
+        }
+    }
+
+    enum class TrashAnimationType {
+        Open,
+        Close
+    }
+
+    private fun screenWidth(): Float {
+        return Resources.getSystem().displayMetrics.widthPixels.toFloat()
+    }
+
+    private fun screenHeight(): Float {
+        return Resources.getSystem().displayMetrics.heightPixels.toFloat()
     }
 
     companion object {

@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _sendFlutterIncrement() {
-    platform.send('_pong');
+    platform.send('addBubble');
   }
 
   void _incrementCounter() {

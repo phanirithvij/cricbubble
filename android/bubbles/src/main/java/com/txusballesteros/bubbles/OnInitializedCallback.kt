@@ -27,3 +27,8 @@ package com.txusballesteros.bubbles
 interface OnInitializedCallback {
     fun onInitialized()
 }
+
+interface PreviewCallback{
+    fun onHide()
+    fun onShow()
+}

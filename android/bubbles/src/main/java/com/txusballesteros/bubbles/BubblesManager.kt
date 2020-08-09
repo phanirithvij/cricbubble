@@ -37,6 +37,8 @@ class BubblesManager private constructor(private val context: Context) {
     private var trashLayoutResourceId = 0
     private var previewResourceId = 0
     private var listener: OnInitializedCallback? = null
+    var previewCallback: PreviewCallback? = null
+
     private val bubbleServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as BubblesServiceBinder
@@ -57,7 +59,7 @@ class BubblesManager private constructor(private val context: Context) {
         bubblesService!!.addTrash(trashLayoutResourceId)
         bubblesService!!.addPreview(previewResourceId)
         bubblesService!!.initializeLayoutCoordinator()
-
+        bubblesService!!.addPreviewCallback(this.previewCallback)
     }
 
     fun initialize() {
@@ -86,6 +88,10 @@ class BubblesManager private constructor(private val context: Context) {
         private val bubblesManager: BubblesManager = getInstance(context)
         fun setInitializationCallback(listener: OnInitializedCallback?): Builder {
             bubblesManager.listener = listener
+            return this
+        }
+        fun setPreviewCallBack(listener: PreviewCallback?): Builder {
+            bubblesManager.previewCallback = listener
             return this
         }
 

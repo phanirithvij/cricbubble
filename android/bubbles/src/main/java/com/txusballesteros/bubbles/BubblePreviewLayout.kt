@@ -29,33 +29,46 @@ import android.animation.AnimatorSet
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+
 
 internal class BubblePreviewLayout : BubbleBaseLayout {
     private var attachedToWindow = false
 
-    constructor(context: Context?) : super(context) {}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         attachedToWindow = true
     }
 
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        Log.d("PreviewIntercept", ev.toString())
+        if (true) {
+            return true
+        }
+        return super.onInterceptTouchEvent(ev)
+    }
+
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         attachedToWindow = false
     }
 
-    fun toggleVisibility() {
+    fun toggleVisibility(callback: PreviewCallback?) {
         // So GONE vs INVISIBLE the difference https://stackoverflow.com/a/23211042/8608146
         // GONE will mean it's not there in the layout tree but invisible means it's just hidden
         // So GONE for our use case as we don't want the preview to interrupt touches while hidden
         if (visibility == View.VISIBLE) {
             visibility = View.GONE
+            callback?.onHide()
         } else if (visibility == View.GONE) {
             visibility = View.VISIBLE
+            callback?.onShow()
         }
     }
 
@@ -63,13 +76,13 @@ internal class BubblePreviewLayout : BubbleBaseLayout {
         if (attachedToWindow) {
             if (visibility != getVisibility()) {
                 if (visibility == View.VISIBLE) {
-                    Log.d("Ok", "Visible")
+//                    Log.d("Ok", "Visible")
                     // todo show some animation for preview opening
-                    // playAnimation(R.animator.bubble_trash_shown_animator);
+                    playAnimation(R.animator.bubble_preview_shown_animator);
                 } else {
+                    playAnimation(R.animator.bubble_preview_hide_animator);
                     // todo show some animation for preview closing
-                    // playAnimation(R.animator.bubble_trash_hide_animator);
-                    Log.d("Ok", "Not visible")
+//                    Log.d("Ok", "Not visible")
                 }
             }
         }

@@ -36,6 +36,7 @@ import android.view.WindowManager
 import java.util.*
 
 class BubblesService : Service() {
+    var previewCallback: PreviewCallback? = null
     private val binder = BubblesServiceBinder()
     private val bubbles: MutableList<BubbleLayout> = ArrayList()
     private lateinit var bubblesTrash: BubbleTrashLayout
@@ -128,6 +129,10 @@ class BubblesService : Service() {
                 .build()
     }
 
+    fun addPreviewCallback(listener: PreviewCallback?){
+        this.previewCallback = listener
+    }
+
     private fun addViewToWindow(view: BubbleBaseLayout) {
         initWM()
         Handler(Looper.getMainLooper()).post { windowManager!!.addView(view, view.viewParams) }
@@ -190,7 +195,8 @@ class BubblesService : Service() {
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    0,
+//                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT)
         } else {
             // TODO check for < O android versions
@@ -199,7 +205,8 @@ class BubblesService : Service() {
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.TYPE_PHONE,
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    0,
                     PixelFormat.TRANSPARENT)
         }
         params.gravity = Gravity.TOP or Gravity.START

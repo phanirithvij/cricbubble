@@ -3,6 +3,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|center_horizontal"
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="0dp"
     android:contentDescription="@string/trash"
     android:src="@mipmap/bubble_trash_background" />

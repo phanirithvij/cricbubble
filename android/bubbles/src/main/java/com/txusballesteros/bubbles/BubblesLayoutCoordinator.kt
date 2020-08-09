@@ -24,41 +24,37 @@
  */
 package com.txusballesteros.bubbles
 
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 
 class BubblesLayoutCoordinator private constructor() {
-    var trashView: BubbleTrashLayout? = null
-    internal var preView: BubblePreviewLayout? = null
+    lateinit var trashView: BubbleTrashLayout
+    internal lateinit var preView: BubblePreviewLayout
     private lateinit var windowManager: WindowManager
     private lateinit var bubblesService: BubblesService
 
     fun notifyBubblePositionChanged(bubble: BubbleLayout) {
-        if (trashView != null) {
-            trashView!!.visibility = View.VISIBLE
-            if (checkIfBubbleIsOverTrash(bubble)) {
-                trashView!!.applyMagnetism()
-                trashView!!.vibrate()
-                applyTrashMagnetismToBubble(bubble)
-            } else {
-                trashView!!.releaseMagnetism()
-            }
+        trashView.visibility = View.VISIBLE
+        if (checkIfBubbleIsOverTrash(bubble)) {
+            trashView.applyMagnetism()
+            trashView.vibrate()
+            applyTrashMagnetismToBubble(bubble)
+        } else {
+            trashView.releaseMagnetism()
         }
     }
 
     fun hidePreview() {
-        preView!!.visibility = View.GONE
+        preView.visibility = View.GONE
+        bubblesService.previewCallback?.onHide()
     }
 
     val preViewVisibility: Int
-        get() = preView!!.visibility
+        get() = preView.visibility
 
     fun notifyPreviewVisibilityListener() {
         // toggle visibility??
-        Log.d("BubbleLayoutCoordinator", preView?.visibility.toString())
-        if (preView != null) preView!!.toggleVisibility()
-        Log.d("BubbleLayoutCoordinator", preView?.visibility.toString())
+        preView.toggleVisibility(bubblesService.previewCallback)
     }
 
     private fun applyTrashMagnetismToBubble(bubble: BubbleLayout) {
@@ -74,7 +70,7 @@ class BubblesLayoutCoordinator private constructor() {
 
     private fun checkIfBubbleIsOverTrash(bubble: BubbleLayout): Boolean {
         var result = false
-        if (trashView!!.visibility == View.VISIBLE) {
+        if (trashView.visibility == View.VISIBLE) {
             val trashContentView = trashContent
             val trashWidth = trashContentView.measuredWidth
             val trashHeight = trashContentView.measuredHeight
@@ -98,22 +94,20 @@ class BubblesLayoutCoordinator private constructor() {
     }
 
     fun notifyBubbleRelease(bubble: BubbleLayout) {
-        if (trashView != null) {
-            if (checkIfBubbleIsOverTrash(bubble)) {
-                bubblesService.removeBubble(bubble)
-            }
-            trashView!!.visibility = View.GONE
+        if (checkIfBubbleIsOverTrash(bubble)) {
+            bubblesService.removeBubble(bubble)
         }
+        trashView.visibility = View.GONE
     }
 
     internal class Builder(service: BubblesService) {
         private val layoutCoordinator: BubblesLayoutCoordinator = instance
-        fun setTrashView(trashView: BubbleTrashLayout?): Builder {
+        fun setTrashView(trashView: BubbleTrashLayout): Builder {
             layoutCoordinator.trashView = trashView
             return this
         }
 
-        fun setPreviewView(preview: BubblePreviewLayout?): Builder {
+        fun setPreviewView(preview: BubblePreviewLayout): Builder {
             layoutCoordinator.preView = preview
             return this
         }
@@ -133,7 +127,7 @@ class BubblesLayoutCoordinator private constructor() {
     }
 
     private val trashContent: View
-        get() = trashView!!.getChildAt(0)
+        get() = trashView.getChildAt(0)
 
     companion object {
         private var INSTANCE: BubblesLayoutCoordinator? = null

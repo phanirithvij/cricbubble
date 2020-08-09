@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="flutter_view" type="id" />
+    <item name="flutter_view2" type="id" />
     <item name="root_view" type="id" />
     <item name="bubble_view" type="id" />
     <item name="flutter_view_parent" type="id" />

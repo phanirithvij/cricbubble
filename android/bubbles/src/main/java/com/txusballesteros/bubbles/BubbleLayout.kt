@@ -54,13 +54,8 @@ class BubbleLayout : BubbleBaseLayout {
     private var animator: MoveAnimator
     private var screenWidth = 0
     private var screenHeight = 0
-
-    @JvmField
     var prevX = 0f
-
-    @JvmField
     var prevY = 0f
-
     private var prevRawX = 0f
     private var prevRawY = 0f
     var shouldStickToWall = true
@@ -109,8 +104,8 @@ class BubbleLayout : BubbleBaseLayout {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                initialX = viewParams!!.x
-                initialY = viewParams!!.y
+                initialX = viewParams.x
+                initialY = viewParams.y
                 initialTouchX = event.rawX
                 initialTouchY = event.rawY
                 playAnimationClickDown()
@@ -124,16 +119,16 @@ class BubbleLayout : BubbleBaseLayout {
                 if (layoutCoordinator != null) {
                     // Fixes the flicker bug in trash layout
                     // Update the coordinates only if magnetism not applied
-                    if (!layoutCoordinator!!.trashView!!.magnetismApplied) {
-                        viewParams!!.x = x
-                        viewParams!!.y = y
+                    if (!layoutCoordinator!!.trashView.magnetismApplied) {
+                        viewParams.x = x
+                        viewParams.y = y
                     } else {
                         // If magnetism is applied prevent moving for small mouse move deltas
                         val dx = prevRawX - event.rawX
                         val dy = prevRawY - event.rawY
                         if (dx * dx + dy * dy > 2) {
-                            viewParams!!.x = x
-                            viewParams!!.y = y
+                            viewParams.x = x
+                            viewParams.y = y
                         }
                     }
                 }
@@ -175,7 +170,7 @@ class BubbleLayout : BubbleBaseLayout {
     }
 
     override fun performClick(): Boolean {
-        Log.d("BubblesLayout", "Perform Click")
+//        Log.d("BubblesLayout", "Perform Click")
         return super.performClick()
     }
 
@@ -189,25 +184,25 @@ class BubbleLayout : BubbleBaseLayout {
             // TODO stick to wall as well
             animator.addListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    Log.d("BubbleLayout", animation.isStarted.toString())
-                    Log.d("BubbleLayout", "Start")
+//                    Log.d("BubbleLayout", animation.isStarted.toString())
+//                    Log.d("BubbleLayout", "Start")
                 }
 
                 // if done start the stick to wall animation
                 @RequiresApi(api = Build.VERSION_CODES.N)
                 override fun onAnimationEnd(animation: Animator) {
-                    Log.d("BubbleLayout", animation.totalDuration.toString())
-                    Log.d("BubbleLayout", "End")
+//                    Log.d("BubbleLayout", animation.totalDuration.toString())
+//                    Log.d("BubbleLayout", "End")
                     goToWall()
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    Log.d("BubbleLayout", "Cancelled")
+//                    Log.d("BubbleLayout", "Cancelled")
                 }
 
                 override fun onAnimationRepeat(animation: Animator) {
-                    Log.d("BubbleLayout", animation.duration.toString())
-                    Log.d("BubbleLayout", "repeat")
+//                    Log.d("BubbleLayout", animation.duration.toString())
+//                    Log.d("BubbleLayout", "repeat")
                 }
             })
             animator.start()
@@ -270,13 +265,11 @@ class BubbleLayout : BubbleBaseLayout {
     }
 
     fun goToWall() {
-        Log.d("BubblesLayout", "Should stick to wall??")
-        Log.d("BubblesLayout", screenWidth.toString() + viewParams!!.x)
         if (shouldStickToWall) {
             val middle = screenWidth / 2
-            val nearestXWall = if (viewParams!!.x >= middle) screenWidth.toFloat() else 0.toFloat()
-            animator.start(nearestXWall, viewParams!!.y.toFloat())
-            Log.d("BubblesLayout", nearestXWall.toString())
+            val nearestXWall = if (viewParams.x >= middle) screenWidth.toFloat() else 0.toFloat()
+            animator.start(nearestXWall, viewParams.y.toFloat())
+//            Log.d("BubblesLayout", nearestXWall.toString())
         }
     }
 
@@ -288,12 +281,12 @@ class BubbleLayout : BubbleBaseLayout {
         val nearestFC: Float
         // View.VISIBLE because we are calling this function after calling toggleVisibility
         if (visibility == View.VISIBLE) {
-            prevX = viewParams!!.x.toFloat()
-            prevY = viewParams!!.y.toFloat()
-            nearestFC = if (viewParams!!.y >= middleY) (screenHeight - 20).toFloat() else 20.toFloat()
+            prevX = viewParams.x.toFloat()
+            prevY = viewParams.y.toFloat()
+            nearestFC = if (viewParams.y >= middleY) (screenHeight - 20).toFloat() else 20.toFloat()
             nearestW = prevX
             if (shouldStickToWall) {
-                nearestW = if (viewParams!!.x >= middleX) screenWidth.toFloat() else 0.toFloat()
+                nearestW = if (viewParams.x >= middleX) screenWidth.toFloat() else 0.toFloat()
             }
             animator.start(nearestW, nearestFC)
         } else {
@@ -302,8 +295,8 @@ class BubbleLayout : BubbleBaseLayout {
     }
 
     private fun move(deltaX: Float, deltaY: Float) {
-        viewParams!!.x += deltaX.toInt()
-        viewParams!!.y += deltaY.toInt()
+        viewParams.x += deltaX.toInt()
+        viewParams.y += deltaY.toInt()
         windowManager.updateViewLayout(this, viewParams)
     }
 
@@ -312,40 +305,39 @@ class BubbleLayout : BubbleBaseLayout {
         private var destinationX = 0f
         private var destinationY = 0f
         private var startingTime: Long = 0
-        private var mlisteners: ArrayList<MoveAnimatorListener>? = null
+        private lateinit var mlisteners: ArrayList<MoveAnimatorListener>
+
         fun start(x: Float, y: Float) {
             safeInit()
             destinationX = x
             destinationY = y
             startingTime = System.currentTimeMillis()
-            for (i in mlisteners!!.indices) {
-                mlisteners!![i].onAnimationStart(this)
+            for (listener in mlisteners) {
+                listener.onAnimationStart(this)
             }
             handler.post(this)
         }
 
         private fun safeInit() {
-            if (mlisteners == null) {
-                mlisteners = ArrayList()
-            }
+            mlisteners = ArrayList()
         }
 
         fun addListener(listener: MoveAnimatorListener) {
             safeInit()
-            mlisteners!!.add(listener)
+            mlisteners.add(listener)
         }
 
         override fun run() {
             if (rootView != null && rootView.parent != null) {
                 val progress = min(1f, (System.currentTimeMillis() - startingTime) / 400f)
-                val deltaX = (destinationX - viewParams!!.x) * progress
-                val deltaY = (destinationY - viewParams!!.y) * progress
+                val deltaX = (destinationX - viewParams.x) * progress
+                val deltaY = (destinationY - viewParams.y) * progress
                 move(deltaX, deltaY)
                 if (progress < 1) {
                     handler.post(this)
                 } else {
-                    for (i in mlisteners!!.indices) {
-                        mlisteners!![i].onAnimationEnd(this)
+                    for (listener in mlisteners) {
+                        listener.onAnimationEnd(this)
                     }
                 }
             }
@@ -357,12 +349,12 @@ class BubbleLayout : BubbleBaseLayout {
         }
 
         private fun removeAllListeners() {
-            mlisteners!!.clear()
+            mlisteners.clear()
         }
 
         fun removeListener(listener: MoveAnimatorListener?) {
-            if (mlisteners!!.isEmpty()) return
-            mlisteners!!.remove(listener)
+            if (mlisteners.isEmpty()) return
+            mlisteners.remove(listener)
         }
     }
 
